@@ -2,12 +2,12 @@ import React from "react";
 
 const Card = () => {
   return (
-    <div className="relative w-45 md:w-72 rounded-2xl overflow-hidden shadow-2xl outline-2 outline-black outline-offset-3 border-2 border-black text-white hover:-translate-y-1.5 transition-all duration-200">
+    <div className="relative w-42 mx-auto md:w-72 rounded-2xl overflow-hidden shadow-2xl outline-2 outline-black outline-offset-3 border-2 border-black text-white hover:-translate-y-1.5 transition-all duration-200">
 
       <img
         src="https://i.postimg.cc/h48wTMwz/Screenshot-2025-07-11-at-2-32-26-AM.png"
         alt="Beetroot Quinoa Salad"
-        className="w-full h-70 md:h-96 object-cover"
+        className="w-full h-72 md:h-98 object-cover"
       />
 
       {/* Dark gradient overlay */}

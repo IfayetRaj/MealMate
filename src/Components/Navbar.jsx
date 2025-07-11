@@ -23,7 +23,7 @@ const Navbar = () => {
       </li>
       <li>
         <NavLink
-          to="/upcomingmeals"
+          to="/upcoming-meals"
           className="hover:font-semibold hover:bg-white transition-all duration-250 font-semibold"
         >
           Upcoming Meals
