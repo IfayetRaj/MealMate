@@ -43,7 +43,7 @@ const Banner = () => {
       {/* Email input */}
       <div className="flex flex-col md:flex-row mt-8 gap-4 w-full md:w-auto px-2">
         <input
-          type="email"
+          type="text"
           placeholder="Enter your email"
           className="px-5 py-4 text-base md:text-sm rounded-full border border-gray-300 w-full md:w-96 focus:outline-none"
         />
