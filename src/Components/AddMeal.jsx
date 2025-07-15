@@ -110,7 +110,7 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
       />
       <button
         type="submit"
-        className="px-6 py-3 bg-black text-white border-2 border-black outline outline-4 outline-offset-4 rounded-xl hover:bg-gray-800 transition md:col-span-2"
+        className="px-6 py-3 bg-black text-white border-2 border-black  outline-4 outline-offset-4 rounded-xl hover:bg-gray-800 transition md:col-span-2"
       >
         Add Meal
       </button>

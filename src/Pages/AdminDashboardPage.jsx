@@ -9,7 +9,7 @@ import AdminUpcomingMeal from '../Components/AdminUpcomingMeal'
 
 const AdminDashboardPage = () => {
   return (
-    <div>
+    <div className='md:w-12/14 mx-auto'>
       <AdminProfile></AdminProfile>
       <AdminManageUser></AdminManageUser>
       <AdminAddMeal></AdminAddMeal>

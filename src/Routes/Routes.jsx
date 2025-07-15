@@ -7,6 +7,9 @@ import MealsPage from "../Pages/MealsPage";
 import UpcomingMealsPage from "../Pages/UpcomingMealsPage";
 import AdminDashboardPage from "../Pages/AdminDashboardPage";
 import UserDashboardPage from "../Pages/UserDashboardPage";
+import CheckoutPage from "../Pages/CheckoutPage";
+
+
 
 const router = createBrowserRouter([
   {
@@ -17,7 +20,8 @@ const router = createBrowserRouter([
       {path: '/meals', element: <MealsPage></MealsPage>},
       {path: '/upcoming-meals', element: <UpcomingMealsPage></UpcomingMealsPage>},
       {path: '/admin-dashboard', element: <AdminDashboardPage></AdminDashboardPage>}, 
-      {path: '/user-dashboard', element: <UserDashboardPage></UserDashboardPage>}
+      {path: '/user-dashboard', element: <UserDashboardPage></UserDashboardPage>},
+      {path: '/checkout', element: <CheckoutPage></CheckoutPage>}, // Placeholder for CheckoutPage
     ]
   },
   {
