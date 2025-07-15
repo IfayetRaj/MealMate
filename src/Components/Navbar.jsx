@@ -72,7 +72,10 @@ const Navbar = () => {
       <Link to='/signin' className="bg-black text-white px-6 py-2 font-bold rounded-3xl border-2 border-black outline-2 outline-black outline-offset-1 active:scale-95">Sign In <CiUser className="md:inline-block hidden" size={20}/></Link>
 
 
-        {/* <div className="dropdown dropdown-end">
+
+
+{/* Profile picture button */}
+        <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
             role="button"
@@ -93,13 +96,13 @@ const Navbar = () => {
               <a className="justify-between">View Profile</a>
             </li>
             <li>
-              <a>Settings</a>
+              <Link to='/user-dashboard'>Dashboard</Link>
             </li>
             <li>
               <a>Logout</a>
             </li>
           </ul>
-        </div> */}
+        </div>
       </div>
     </div>
   );

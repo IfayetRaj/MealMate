@@ -5,7 +5,8 @@ import SignUpPage from "../Pages/SignUpPage";
 import SignInPage from "../Pages/SignInPage";
 import MealsPage from "../Pages/MealsPage";
 import UpcomingMealsPage from "../Pages/UpcomingMealsPage";
-import AdminDashboard from "../Pages/AdminDashboard";
+import AdminDashboardPage from "../Pages/AdminDashboardPage";
+import UserDashboardPage from "../Pages/UserDashboardPage";
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,8 @@ const router = createBrowserRouter([
       {index: true, element: <HomePage></HomePage>},
       {path: '/meals', element: <MealsPage></MealsPage>},
       {path: '/upcoming-meals', element: <UpcomingMealsPage></UpcomingMealsPage>},
-      {path: 'admin-dashboard', element: <AdminDashboard></AdminDashboard>}
+      {path: '/admin-dashboard', element: <AdminDashboardPage></AdminDashboardPage>}, 
+      {path: '/user-dashboard', element: <UserDashboardPage></UserDashboardPage>}
     ]
   },
   {
