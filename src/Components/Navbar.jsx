@@ -32,7 +32,7 @@ const Navbar = () => {
     </>
   );
   return (
-    <div className="navbar bg-base-500  md:px-10">
+    <div className="navbar bg-base-500  md:px-10 ">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -69,12 +69,14 @@ const Navbar = () => {
       <div className="navbar-end">
         {/* <a className="btn">Button</a> */}
 
-      <Link to='/signin' className="bg-black text-white px-6 py-2 font-bold rounded-3xl border-2 border-black outline-2 outline-black outline-offset-1 active:scale-95">Sign In <CiUser className="md:inline-block hidden" size={20}/></Link>
+        <Link 
+          to="/signin"
+          className="bg-black text-white px-6 py-2 font-bold rounded-3xl border-2 border-black outline-2 outline-black outline-offset-1 active:scale-95"
+        >
+          Sign In <CiUser className="md:inline-block hidden" size={20} />
+        </Link>
 
-
-
-
-{/* Profile picture button */}
+        {/* Profile picture button */}
         <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
@@ -96,7 +98,7 @@ const Navbar = () => {
               <a className="justify-between">View Profile</a>
             </li>
             <li>
-              <Link to='/user-dashboard'>Dashboard</Link>
+              <Link to="/user-dashboard">Dashboard</Link>
             </li>
             <li>
               <a>Logout</a>

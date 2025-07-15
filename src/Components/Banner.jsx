@@ -1,14 +1,24 @@
 import React from "react";
+import { motion } from "motion/react"
 
 const Banner = () => {
   return (
-    <section className="flex py-32 md:py-40 flex-col justify-center items-center text-center px-4 bg-white relative overflow-hidden md:px-20">
+    <section
+      className="flex py-32 md:py-40 flex-col justify-center items-center text-center px-4 relative overflow-hidden md:px-20 bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url('/banner.png')`,
+      }}
+    >
       {/* Background accents (optional) */}
       <div className="absolute top-10 left-10 w-8 h-8 rounded-full border-2 border-black animate-spin-slow"></div>
       <div className="absolute bottom-10 right-10 w-8 h-8 rounded-full border-2 border-black animate-pulse"></div>
 
       {/* Headline */}
-      <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold flex flex-wrap items-center justify-center gap-4">
+      <motion.h1 
+       initial={{ opacity: 0, y: -50 }}
+       animate={{ opacity: 1, y: 0 }}
+       transition={{ duration: 1.2, ease: "easeOut" }}
+      className="text-3xl sm:text-4xl md:text-6xl font-extrabold flex flex-wrap items-center justify-center gap-4">
         <span>Manage</span>
         <img
           src="https://i.postimg.cc/LsnbLDpf/Screenshot-2025-07-11-at-1-56-14-AM.png"
@@ -32,12 +42,12 @@ const Banner = () => {
           alt="trainer"
           className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-full"
         />
-      </h1>
+      </motion.h1>
 
       {/* Subheading */}
       <p className="text-gray-600 mt-6 max-w-xl px-2">
-        Simplify hostel life with smart meal plans, easy reviews, and better food
-        experiences for every student — all in one place!
+        Simplify hostel life with smart meal plans, easy reviews, and better
+        food experiences for every student — all in one place!
       </p>
 
       {/* Email input */}

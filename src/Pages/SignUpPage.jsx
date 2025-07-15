@@ -4,13 +4,23 @@ import { Link } from "react-router";
 
 const SignUpPage = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10">
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-10"
+      style={{
+        backgroundImage: `url('/banner.png')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md border-2 border-black outline-2 outline-black outline-offset-2 rounded-3xl p-8 shadow-xl">
         <h2 className="text-3xl md:text-4xl text-center font-extrabold  mb-2">
           Create your account
         </h2>
         <p className="text-sm text-center mb-6">
-          Give us some of your information to get access to <Link to='/' className='font-bold text-lg'>MealMate.</Link>
+          Give us some of your information to get access to{" "}
+          <Link to="/" className="font-bold text-lg">
+            MealMate.
+          </Link>
         </p>
 
         <form className="space-y-4">
