@@ -8,6 +8,8 @@ const SignInPage = () => {
   const{signInUser} = useContext(AuthContext);
 
   const navigate = useNavigate();
+  // const location = useLocation();
+  // const from = location.state?.from?.pathname || "/";
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
@@ -17,7 +19,7 @@ const SignInPage = () => {
 
     signInUser(email, password)
     .then(()=>{
-      navigate('/');
+      navigate('/'); 
       form.reset();
       toast.success("Successfully signed in!");
     })

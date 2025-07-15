@@ -10,7 +10,6 @@ const Navbar = () => {
   const [ loggedInUser, setLoggedInUser ] = useState(user);
 
   const handleLogout = () =>{
-    console.log("hi")
     logOutUser()
     .then(()=>{
       setLoggedInUser(null);

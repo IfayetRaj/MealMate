@@ -9,31 +9,68 @@ import AdminDashboardPage from "../Pages/AdminDashboardPage";
 import UserDashboardPage from "../Pages/UserDashboardPage";
 import CheckoutPage from "../Pages/CheckoutPage";
 import MealDetailPage from "../Pages/MealDetailPage";
-
-
+import PrivateRoute from "../Context/PrivateRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: MainLayout,
     children: [
-      {index: true, element: <HomePage></HomePage>},
-      {path: '/meals', element: <MealsPage></MealsPage>},
-      {path: '/upcoming-meals', element: <UpcomingMealsPage></UpcomingMealsPage>},
-      {path: '/admin-dashboard', element: <AdminDashboardPage></AdminDashboardPage>}, 
-      {path: '/user-dashboard', element: <UserDashboardPage></UserDashboardPage>},
-      {path: '/checkout', element: <CheckoutPage></CheckoutPage>}, 
-      {path: '/meal-details', element: <MealDetailPage></MealDetailPage>}// Placeholder for CheckoutPage
-    ]
+      { index: true, element: <HomePage></HomePage> },
+      {
+        path: "/meals",
+        element: <MealsPage></MealsPage>,
+      },
+      {
+        path: "/upcoming-meals",
+        element: (
+          <PrivateRoute>
+            <UpcomingMealsPage></UpcomingMealsPage>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/admin-dashboard",
+        element: (
+          <PrivateRoute>
+            <AdminDashboardPage></AdminDashboardPage>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/user-dashboard",
+        element: (
+          <PrivateRoute>
+            <UserDashboardPage></UserDashboardPage>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/checkout",
+        element: (
+          <PrivateRoute>
+            <CheckoutPage></CheckoutPage>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/meal-details",
+        element: (
+          <PrivateRoute>
+            <MealDetailPage></MealDetailPage>
+          </PrivateRoute>
+        ),
+      }, // Placeholder for CheckoutPage
+    ],
   },
   {
-    path: '/signup',
-    Component: SignUpPage
+    path: "/signup",
+    Component: SignUpPage,
   },
   {
-    path: '/signin',
-    Component: SignInPage
-  }
+    path: "/signin",
+    Component: SignInPage,
+  },
 ]);
 
 export default router;

@@ -41,9 +41,10 @@ const SignUpPage = () => {
           // creating user
           createUser(email, password)
             .then(() => {
-              updateUserProfile(name, photoURL);
+              updateUserProfile(name, photoURL)
+              ;
               toast.success("User created successfully");
-              navigate("/");
+              navigate('/'); 
               from.reset();
             })
             .catch((error) => {
