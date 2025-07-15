@@ -1,13 +1,60 @@
-import React from "react";
+import React, { useContext } from "react";
 import SocialLogin from "../Components/SocialLogin";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { AuthContext } from "../Context/AuthContext";
+import toast, { Toaster } from "react-hot-toast";
 
 const SignUpPage = () => {
+  const { createUser, updateUserProfile } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   // handel from submit
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+    const from = event.target;
+    const name = from.name.value;
+    const email = from.email.value;
+    const password = from.password.value;
+    const photo = from.photo.files[0];
+    console.log({ name, email, password, photo });
 
+    // uploading to IngBB
+    const formData = new FormData();
+    formData.append("image", photo);
 
+    fetch(
+      `https://api.imgbb.com/1/upload?key=${
+        import.meta.env.VITE_IMGBB_API_KEY
+      }`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
 
+          const photoURL = data.data.display_url;
+          console.log("Photo uploaded successfully", photoURL);
+
+          // creating user
+          createUser(email, password)
+            .then(() => {
+              updateUserProfile(name, photoURL);
+              toast.success("User created successfully");
+              navigate("/");
+              from.reset();
+            })
+            .catch((error) => {
+              toast.error(`Failed to create user${error.message}`);
+            });
+        } else {
+          console.error("Failed to upload photo", data);
+        }
+      });
+
+  };
 
   return (
     <div

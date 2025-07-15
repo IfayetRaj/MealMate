@@ -1,8 +1,32 @@
-import React from "react";
+import React, { useContext } from "react";
 import SocialLogin from "../Components/SocialLogin";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { AuthContext } from "../Context/AuthContext";
+import { toast } from "react-hot-toast";
 
 const SignInPage = () => {
+  const{signInUser} = useContext(AuthContext);
+
+  const navigate = useNavigate();
+
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const email = form.email.value;
+    const password = form.password.value;
+
+    signInUser(email, password)
+    .then(()=>{
+      navigate('/');
+      form.reset();
+      toast.success("Successfully signed in!");
+    })
+    .catch(() => {
+      toast.error("Failed to sign in. Please check your credentials.");
+    });
+  }
+
+
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-10"
@@ -23,7 +47,7 @@ const SignInPage = () => {
           </Link>
         </p>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleFormSubmit}>
           <input
             type="email"
             name="email"

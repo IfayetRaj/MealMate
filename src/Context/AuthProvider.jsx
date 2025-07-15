@@ -5,6 +5,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
   updateProfile,
 } from "firebase/auth";
 import { auth, provider } from "../Firebase/Firebase.init";
@@ -37,9 +38,9 @@ const AuthProvider = ({ children }) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
   // sign out user
-  const signOutUser = () => {
+  const logOutUser = () => {
     setLoading(true); // set loading to true while signing out
-    return signOutUser(auth);
+    return signOut(auth);
   };
 
   // update user
@@ -48,9 +49,7 @@ const AuthProvider = ({ children }) => {
     return updateProfile(auth.currentUser, {
       displayName: name,
       photoURL: photoURL,
-    }).finally(() => {
-      setLoading(false); // set loading to false after updating user profile
-    });
+    })
   };
 
   // creating user with google sign in
@@ -64,7 +63,7 @@ const AuthProvider = ({ children }) => {
     loading,
     createUser,
     signInUser,
-    signOutUser,
+    logOutUser,
     updateUserProfile,
     googleSignIn,
   };

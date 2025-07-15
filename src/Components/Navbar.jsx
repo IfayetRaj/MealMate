@@ -1,8 +1,30 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { NavLink, Link } from "react-router";
 import { CiUser } from "react-icons/ci";
+import { AuthContext } from "../Context/AuthContext";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
+  const { user,logOutUser } = useContext(AuthContext);
+  console.log(user);
+
+  const [ loggedInUser, setLoggedInUser ] = useState(user);
+
+  const handleLogout = () =>{
+    console.log("hi")
+    logOutUser()
+    .then(()=>{
+      setLoggedInUser(null);
+      toast.success("Successfully logged out!");
+    })
+    .catch((error) => {
+      console.error("Logout failed:", error);
+      toast.error("Failed to log out. Please try again.");
+    });
+  }
+
+
+
   const links = (
     <>
       <li>
@@ -67,44 +89,47 @@ const Navbar = () => {
         <ul className="menu menu-horizontal px-1">{links}</ul>
       </div>
       <div className="navbar-end">
-        {/* <a className="btn">Button</a> */}
 
-        <Link 
-          to="/signin"
-          className="bg-black text-white px-6 py-2 font-bold rounded-3xl border-2 border-black outline-2 outline-black outline-offset-1 active:scale-95"
-        >
-          Sign In <CiUser className="md:inline-block hidden" size={20} />
-        </Link>
+
+        {loggedInUser? (
+          <div className="dropdown dropdown-end">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost btn-circle avatar"
+            >
+              <div className="w-13 rounded-full ring ring-blue-400 ring-offset-base-100 ring-offset-2 transition duration-300">
+                <img
+                  alt="User Avatar"
+                  src={loggedInUser.photoURL}
+                />
+              </div>
+            </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+            >
+              <li>
+                <p className="justify-between bg-black text-white font-semibold">{loggedInUser.displayName}</p>
+              </li>
+              <li>
+                <Link to="/user-dashboard">Dashboard</Link>
+              </li>
+              <li>
+                <button onClick={handleLogout}>Logout</button>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <Link
+            to="/signin"
+            className="bg-black text-white px-6 py-2 font-bold rounded-3xl border-2 border-black outline-2 outline-black outline-offset-1 active:scale-95"
+          >
+            Join Us <CiUser className="md:inline-block hidden" size={20} />
+          </Link>
+        )}
 
         {/* Profile picture button */}
-        <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-circle avatar"
-          >
-            <div className="w-10 rounded-full ring ring-blue-400 ring-offset-base-100 ring-offset-2 transition duration-300">
-              <img
-                alt="User Avatar"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              />
-            </div>
-          </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-          >
-            <li>
-              <a className="justify-between">View Profile</a>
-            </li>
-            <li>
-              <Link to="/user-dashboard">Dashboard</Link>
-            </li>
-            <li>
-              <a>Logout</a>
-            </li>
-          </ul>
-        </div>
       </div>
     </div>
   );
