@@ -17,6 +17,7 @@ const AdminAddMeal = () => {
           <input type="text" placeholder="Ingredients" className="border p-3 rounded-xl focus:ring-2 ring-black" />
           <textarea placeholder="Description" className="border p-3 rounded-xl md:col-span-2 focus:ring-2 ring-black"></textarea>
           <input type="number" placeholder="Price" className="border p-3 rounded-xl focus:ring-2 ring-black" />
+          <input type="text" placeholder="Distributor name" className="border p-3 rounded-xl focus:ring-2 ring-black" />
           <input type="datetime-local" className="border p-3 rounded-xl focus:ring-2 ring-black" />
           <input type="text" value={admin.name} readOnly className="border p-3 rounded-xl bg-gray-100 text-gray-500" />
           <input type="text" value={admin.email} readOnly className="border p-3 rounded-xl bg-gray-100 text-gray-500" />

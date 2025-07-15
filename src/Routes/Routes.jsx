@@ -8,6 +8,7 @@ import UpcomingMealsPage from "../Pages/UpcomingMealsPage";
 import AdminDashboardPage from "../Pages/AdminDashboardPage";
 import UserDashboardPage from "../Pages/UserDashboardPage";
 import CheckoutPage from "../Pages/CheckoutPage";
+import MealDetailPage from "../Pages/MealDetailPage";
 
 
 
@@ -21,7 +22,8 @@ const router = createBrowserRouter([
       {path: '/upcoming-meals', element: <UpcomingMealsPage></UpcomingMealsPage>},
       {path: '/admin-dashboard', element: <AdminDashboardPage></AdminDashboardPage>}, 
       {path: '/user-dashboard', element: <UserDashboardPage></UserDashboardPage>},
-      {path: '/checkout', element: <CheckoutPage></CheckoutPage>}, // Placeholder for CheckoutPage
+      {path: '/checkout', element: <CheckoutPage></CheckoutPage>}, 
+      {path: '/meal-details', element: <MealDetailPage></MealDetailPage>}// Placeholder for CheckoutPage
     ]
   },
   {
