@@ -3,6 +3,12 @@ import SocialLogin from "../Components/SocialLogin";
 import { Link } from "react-router";
 
 const SignUpPage = () => {
+
+  // handel from submit
+
+
+
+
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-10"
@@ -23,7 +29,7 @@ const SignUpPage = () => {
           </Link>
         </p>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleFormSubmit}>
           <input
             type="text"
             name="name"
