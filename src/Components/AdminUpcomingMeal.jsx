@@ -1,17 +1,44 @@
-import React, { useState } from 'react';
-import AddMeal from './AddMeal'; // ✅ reuse the AddMeal component if you have it
+import React, { useState, useEffect, useContext } from 'react';
+import AddMeal from './AddMeal';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { AuthContext } from '../Context/AuthContext';
 
 const AdminUpcomingMeal = () => {
   const [showModal, setShowModal] = useState(false);
+  const [upcomingMeals, setUpcomingMeals] = useState([]);
+  const {userData} = useContext(AuthContext);
+  const { displayName, email } = userData 
 
-  const upcomingMeals = [
-    { id: 1, title: "Special Pizza", likes: 50 },
-  ];
+  // Fetch upcoming meals from backend on mount
+  useEffect(() => {
+    fetchUpcomingMeals();
+  }, []);
 
-  const handleAddUpcomingMeal = (data) => {
-    console.log("Upcoming Meal Added:", data);
-    // TODO: Send to your backend
-    setShowModal(false);
+  const fetchUpcomingMeals = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/upcoming-meals`);
+      setUpcomingMeals(res.data);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load upcoming meals.");
+    }
+  };
+
+  const handleAddUpcomingMeal = async (data) => {
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/upcoming-meals`, data);
+      if (res.data.success) {
+        toast.success("Upcoming Meal added!");
+        setShowModal(false);
+        fetchUpcomingMeals(); // Refresh list
+      } else {
+        toast.error("Failed to add meal.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error adding upcoming meal.");
+    }
   };
 
   return (
@@ -20,7 +47,7 @@ const AdminUpcomingMeal = () => {
         <h3 className="text-2xl font-bold text-gray-800">Upcoming Meals</h3>
         <button
           onClick={() => setShowModal(true)}
-          className="px-6 py-2 border w-full md:w-fit border-black text-black rounded-sm md:rounded-3xl  outline-4 outline-offset-4  hover:bg-black hover:text-white transition"
+          className="px-6 py-2 border w-full md:w-fit border-black text-black rounded-sm md:rounded-3xl outline-4 outline-offset-4 hover:bg-black hover:text-white transition"
         >
           Add Upcoming Meal
         </button>
@@ -30,15 +57,17 @@ const AdminUpcomingMeal = () => {
         <thead>
           <tr className="bg-gray-100 text-left text-gray-600 uppercase text-sm">
             <th className="p-3 md:p-4">Title</th>
-            <th className="p-3 md:p-4">Likes</th>
+            <th className="p-3 md:p-4">Category</th>
+            <th className="p-3 md:p-4">Price</th>
             <th className="p-3 md:p-4">Action</th>
           </tr>
         </thead>
         <tbody>
           {upcomingMeals.map((meal) => (
-            <tr key={meal.id} className="border-b hover:bg-gray-50">
+            <tr key={meal._id} className="border-b hover:bg-gray-50">
               <td className="p-3 md:p-4">{meal.title}</td>
-              <td className="p-3 md:p-4">{meal.likes}</td>
+              <td className="p-3 md:p-4">{meal.category}</td>
+              <td className="p-3 md:p-4">{meal.price}</td>
               <td className="p-3 md:p-4">
                 <button className="px-4 md:px-6 py-2 rounded-3xl border-2 bg-black text-white font-semibold border-black active:scale-95">
                   Publish
@@ -61,8 +90,8 @@ const AdminUpcomingMeal = () => {
             </button>
             <h3 className="text-2xl font-bold mb-6 text-gray-800">Add Upcoming Meal</h3>
             <AddMeal
-              adminName="Admin Name"
-              adminEmail="admin@example.com"
+              adminName={displayName}
+              adminEmail={email}
               onSubmit={handleAddUpcomingMeal}
             />
           </div>

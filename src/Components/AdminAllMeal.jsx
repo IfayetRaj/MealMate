@@ -1,24 +1,42 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Link } from "react-router";
 const AdminAllMeal = () => {
-  const meals = [
-    {
-      id: 1,
-      title: "Spaghetti",
-      likes: 120,
-      reviews: 30,
-      rating: 4.5,
-      distributor: "Admin Name",
-    },
-    {
-      id: 2,
-      title: "Burger",
-      likes: 90,
-      reviews: 20,
-      rating: 4.2,
-      distributor: "Admin Name",
-    },
-  ];
+  const [allMeals, setAllMeals] = useState([]);
+
+  useEffect(() => {
+    const fetchMeals = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/meals`
+        );
+        setAllMeals(response.data);
+      } catch (error) {
+        console.log(error);
+        toast.error("Failed to fetch meals");
+      }
+    };
+    fetchMeals();
+  }, []);
+
+
+  const handleDelete = async (mealId) => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/meals/${mealId}`
+      );
+      if (response) {
+        toast.success("Meal deleted successfully");
+        setAllMeals(allMeals.filter((meal) => meal._id !== mealId));
+      } else {
+        toast.error("Failed to delete meal");
+      }
+    } catch (error) {
+      console.error("Error deleting meal:", error);
+      toast.error("Failed to delete meal");
+    }
+  };
 
   return (
     <section className="bg-white rounded-3xl shadow-lg p-8 overflow-x-auto my-5 md:my-8">
@@ -38,23 +56,29 @@ const AdminAllMeal = () => {
           </tr>
         </thead>
         <tbody>
-          {meals.map((meal) => (
+          {allMeals.map((meal) => (
             <tr key={meal.id} className="border-b hover:bg-gray-50">
               <td className="p-4">{meal.title}</td>
               <td className="p-4">{meal.likes}</td>
               <td className="p-4">{meal.reviews}</td>
               <td className="p-4">{meal.rating}</td>
-              <td className="p-4">{meal.distributor}</td>
+              <td className="p-4">{meal.distributorName}</td>
               <td className="p-4 flex flex-wrap gap-2 flex-col md:flex-row">
                 <button className=" w-[150px] px-4 md:px-6 py-2 rounded-3xl border-2 bg-black text-white font-semibold border-black active:scale-95">
                   Update
                 </button>
-                <button className="w-[150px] px-4  md:px-6 py-2 rounded-3xl bg-[#c72828f2] text-white font-semibold active:scale-95 hover:bg-red-600 transition">
+                <button
+                  onClick={() => handleDelete(meal._id)}
+                  className="w-[150px] px-4  md:px-6 py-2 rounded-3xl bg-[#c72828f2] text-white font-semibold active:scale-95 hover:bg-red-600 transition"
+                >
                   Delete
                 </button>
-                <button className="w-[150px] px-4  md:px-6 py-2 rounded-3xl bg-[#FFCB74] text-white font-semibold active:scale-95 hover:bg-yellow-400 transition ">
-                  View Meal
-                </button>
+
+                <Link to={`/meal-details/${meal._id}`}>
+                  <button className="w-[150px] px-4  md:px-6 py-2 rounded-3xl bg-[#FFCB74] text-white font-semibold active:scale-95 hover:bg-yellow-400 transition ">
+                    View Meal
+                  </button>
+                </Link>
               </td>
             </tr>
           ))}

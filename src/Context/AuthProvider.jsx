@@ -15,7 +15,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  console.log(user);
+
 
   // observer
   useEffect(() => {
@@ -38,14 +38,6 @@ const AuthProvider = ({ children }) => {
   
     return () => unsubscribe();
   }, []);
-
-  console.log(userData);
-
-
-
-
-
-
 
 
   // create user with email and password

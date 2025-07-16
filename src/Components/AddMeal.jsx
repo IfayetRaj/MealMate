@@ -1,36 +1,89 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
-    image: "",
+    image: null, 
+    distributorName: "",
     ingredients: "",
     description: "",
     price: "",
     postTime: "",
   });
 
+  const [uploading, setUploading] = useState(false);
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    const { name, value, files } = e.target;
+
+    if (name === "image") {
+      setFormData((prev) => ({
+        ...prev,
+        image: files[0],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      title: "",
-      category: "",
-      image: "",
-      ingredients: "",
-      description: "",
-      price: "",
-      postTime: "",
-    });
+    if (!formData.image) {
+      alert("Please select an image!");
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      // Upload image to imgbb
+      const imgbbAPI = `https://api.imgbb.com/1/upload?key=${
+        import.meta.env.VITE_IMGBB_API_KEY
+      }`;
+
+      const imageData = new FormData();
+      imageData.append("image", formData.image);
+
+      const res = await axios.post(imgbbAPI, imageData);
+
+      if (res.data.success) {
+        const imageUrl = res.data.data.url;
+
+        // Now send data with uploaded image URL
+        const mealData = {
+          ...formData,
+          image: imageUrl,
+        };
+        delete mealData.image; // remove the file, add url instead
+        mealData.image = imageUrl;
+
+        onSubmit(mealData);
+
+        // Reset form
+        setFormData({
+          title: "",
+          category: "",
+          image: null,
+          distributorName: "",
+          ingredients: "",
+          description: "",
+          price: "",
+          postTime: "",
+        });
+      } else {
+        alert("Image upload failed. Try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Image upload error!");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -44,24 +97,39 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
         required
         className="border p-3 rounded-xl focus:ring-2 ring-black"
       />
-      <input
-        type="text"
+
+      <select
         name="category"
         value={formData.category}
         onChange={handleChange}
-        placeholder="Category"
+        className="border p-3 rounded-xl focus:ring-2 ring-black"
+        required
+      >
+        <option value="">Select category</option>
+        <option value="Breakfast">Breakfast</option>
+        <option value="Lunch">Lunch</option>
+        <option value="Dinner">Dinner</option>
+      </select>
+
+      <input
+        type="file"
+        name="image"
+        accept="image/*"
+        onChange={handleChange}
         required
         className="border p-3 rounded-xl focus:ring-2 ring-black"
       />
+
       <input
         type="text"
-        name="image"
-        value={formData.image}
+        name="distributorName"
+        value={formData.distributorName}
         onChange={handleChange}
-        placeholder="Image URL"
+        placeholder="Distributor name"
         required
         className="border p-3 rounded-xl focus:ring-2 ring-black"
       />
+
       <input
         type="text"
         name="ingredients"
@@ -71,6 +139,7 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
         required
         className="border p-3 rounded-xl focus:ring-2 ring-black"
       />
+
       <textarea
         name="description"
         value={formData.description}
@@ -79,6 +148,7 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
         required
         className="border p-3 rounded-xl md:col-span-2 focus:ring-2 ring-black"
       ></textarea>
+
       <input
         type="number"
         name="price"
@@ -88,6 +158,7 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
         required
         className="border p-3 rounded-xl focus:ring-2 ring-black"
       />
+
       <input
         type="datetime-local"
         name="postTime"
@@ -96,6 +167,7 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
         required
         className="border p-3 rounded-xl focus:ring-2 ring-black"
       />
+
       <input
         type="text"
         value={adminName}
@@ -108,11 +180,13 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
         readOnly
         className="border p-3 rounded-xl bg-gray-100 text-gray-500"
       />
+
       <button
         type="submit"
-        className="px-6 py-3 bg-black text-white border-2 border-black  outline-4 outline-offset-4 rounded-xl hover:bg-gray-800 transition md:col-span-2"
+        disabled={uploading}
+        className="px-6 py-3 bg-black text-white border-2 border-black outline-4 outline-offset-4 rounded-xl hover:bg-gray-800 transition md:col-span-2"
       >
-        Add Meal
+        {uploading ? "Uploading..." : "Add Meal"}
       </button>
     </form>
   );

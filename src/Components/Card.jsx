@@ -1,35 +1,49 @@
 import React from "react";
+import { Link } from "react-router";
 
-const Card = () => {
+const Card = ({ meal }) => {
+  if (!meal) {
+    return <div className="text-red-500">No meal data</div>;
+  }
+
+  const { image, title, description, date, likes } = meal;
+
   return (
-    <div className="relative w-42 mx-auto md:w-72 rounded-2xl overflow-hidden shadow-2xl outline-2 outline-black outline-offset-3 border-2 border-black text-white hover:-translate-y-1.5 transition-all duration-200">
+    <Link to={`/meal-details/${meal._id}`}>
+      <div className="relative w-42 mx-auto md:w-72 rounded-2xl overflow-hidden shadow-2xl outline-2 outline-black outline-offset-3 border-2 border-black text-white hover:-translate-y-1.5 transition-all duration-200">
+        {image ? (
+          <img
+            src={image}
+            alt={title || "Meal image"}
+            className="w-full h-72 md:h-98 object-cover"
+          />
+        ) : (
+          <div className="w-full h-72 md:h-98 bg-gray-200 flex items-center justify-center text-black">
+            No Image
+          </div>
+        )}
 
-      <img
-        src="https://i.postimg.cc/h48wTMwz/Screenshot-2025-07-11-at-2-32-26-AM.png"
-        alt="Beetroot Quinoa Salad"
-        className="w-full h-72 md:h-98 object-cover"
-      />
+        {/* Dark gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
 
-      {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+        {/* Content */}
+        <div className="absolute bottom-0 p-4 w-full">
+          <h3 className="text-lg font-semibold leading-tight mb-2">
+            {title || "Untitled Meal"}
+          </h3>
+          <p className="text-sm">{description || "No description provided."}</p>
 
-      {/* Content */}
-      <div className="absolute bottom-0 p-4 w-full">
-        <h3 className="text-lg font-semibold leading-tight mb-2">
-          Beetroot Quinoa Salad
-        </h3>
-        <p className="text-sm">Orange Ginger Dressing</p>
-
-        <div className="gap-3 mt-3 text-sm text-gray-300 flex flex-col md:flex-row">
-          <span className="bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-            Rating: 
-          </span>
-          <span className="bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-            Loved by: 
-          </span>
+          <div className="gap-3 mt-3 text-sm text-gray-300 flex flex-col md:flex-row">
+            <span className="bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+              Date: {date || "N/A"}
+            </span>
+            <span className="bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+              Loved by: {likes || 0}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

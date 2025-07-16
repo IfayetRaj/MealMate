@@ -1,53 +1,134 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FaHeart, FaStar } from "react-icons/fa";
+import { useParams } from "react-router";
+import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
+import toast from "react-hot-toast";
 
 const MealDetailPage = () => {
-  // Dummy meal data
-  const meal = {
-    id: 1,
-    title: "Deluxe Sushi Platter",
-    image:
-      "https://i.postimg.cc/HkpYSGM8/Screenshot-2025-07-15-at-5-35-17-PM.png",
-    distributor: {
-      name: "Chef Aiko",
-    },
-    description:
-      "Experience authentic Japanese flavors with our deluxe sushi platter, featuring premium ingredients and chef’s special sauce.",
-    ingredients: ["Salmon", "Tuna", "Rice", "Avocado", "Seaweed"],
-    postTime: "2025-07-15T14:30:00Z",
-    rating: 4.8,
-    likes: 128,
-  };
+  const { id } = useParams();
+  const { userData } = useContext(AuthContext);
+  const [meal, setMeal] = useState(null);
 
-  const [likes, setLikes] = useState(meal.likes);
+  const [likes, setLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+  // here
+  const [requested, setRequested] = useState(false);
+
   const [newReview, setNewReview] = useState("");
-  const [reviews, setReviews] = useState([
-    { id: 1, user: "Alex", text: "Amazing taste! Will order again." },
-    { id: 2, user: "Samira", text: "Very fresh and beautifully presented." },
-  ]);
+  const [reviews, setReviews] = useState([]);
 
-  const handleLike = () => {
-    // Pretend this updates server too
-    setLikes((prev) => prev + 1);
+  const user = {
+    userId: userData?._id,
+    displayName: userData?.displayName,
+    email: userData?.email,
+    image: userData?.photoURL,
   };
 
-  const handleRequestMeal = () => {
-    console.log("Request meal logic here.");
-    // POST request to save request
+  useEffect(() => {
+    const fetchMeal = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/meals/${id}`
+        );
+        setMeal(res.data);
+        setLikes(res.data.likes || 0);
+      } catch (err) {
+        console.error("Failed to fetch meal:", err);
+      }
+    };
+
+    const fetchReviews = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/reviews/${id}`
+        );
+        setReviews(res.data);
+      } catch (err) {
+        console.error("Failed to fetch reviews:", err);
+      }
+    };
+    fetchMeal();
+    fetchReviews();
+  }, [id, user.email]);
+
+  const handleLikeToggle = async () => {
+    const action = liked ? "dislike" : "like";
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/meals/${id}/like`,
+        { action }
+      );
+      setLikes((prev) => prev + (action === "like" ? 1 : -1));
+      setLiked(!liked);
+    } catch (err) {
+      console.error("Failed to toggle like:", err);
+    }
   };
 
-  const handlePostReview = () => {
+
+
+// this one-----------------------------------------------------
+const handleRequestMeal = async () => {
+  const data = {
+    userName: userData.displayName,
+    userEmail: userData.email,
+    mealId: meal._id,
+    mealTitle: meal.title,
+    mealLikes: meal.likes,
+    mealPrice: meal.price,
+    status: "pending",
+  };
+
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/request-meal`,
+      data
+    );
+
+    console.log("Response:", response.data);
+
+    if (response.data.success) {
+      setRequested(true);
+      toast.success("Meal requested successfully");
+    } else {
+      toast.error("You have already requested this meal.");
+    }
+  } catch (error) {
+    console.error("Error requesting meal:", error);
+    toast.error("Something went wrong while requesting the meal.");
+  }
+};
+
+  const handlePostReview = async () => {
     if (!newReview.trim()) return;
-    setReviews([
-      ...reviews,
-      { id: Date.now(), user: "You", text: newReview.trim() },
-    ]);
-    setNewReview("");
+
+    const reviewData = {
+      mealId: id,
+      displayName: user.displayName,
+      email: user.email,
+      image: user.image,
+      text: newReview.trim(),
+    };
+
+    try {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/reviews`, reviewData);
+      setReviews([
+        { ...reviewData, date: new Date().toISOString() },
+        ...reviews,
+      ]);
+      setNewReview("");
+    } catch (err) {
+      console.error("Failed to post review:", err);
+    }
   };
+
+  if (!meal) {
+    return <div className="text-center py-20">Loading meal...</div>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      {/* Meal Image + Info */}
       <div className="flex flex-col md:flex-row gap-8 bg-white rounded-3xl shadow overflow-hidden">
         <img
           src={meal.image}
@@ -60,27 +141,28 @@ const MealDetailPage = () => {
               {meal.title}
             </h1>
             <p className="text-gray-500 mb-2">
-              By <span className="font-semibold">{meal.distributor.name}</span>
+              By <span className="font-semibold">{meal.distributorName}</span>
             </p>
             <p className="text-gray-700 mb-4">{meal.description}</p>
 
             <div className="mb-4">
               <h4 className="font-semibold mb-1">Ingredients:</h4>
               <ul className="flex flex-wrap gap-2">
-                {meal.ingredients.map((ing) => (
-                  <li
-                    key={ing}
-                    className="bg-gray-100 px-3 py-1 rounded-full text-sm"
-                  >
-                    {ing}
-                  </li>
-                ))}
+                {Array.isArray(meal.ingredients) &&
+                  meal.ingredients.map((ing) => (
+                    <li
+                      key={ing}
+                      className="bg-gray-100 px-3 py-1 rounded-full text-sm"
+                    >
+                      {ing}
+                    </li>
+                  ))}
               </ul>
             </div>
 
             <p className="text-gray-500 text-sm mb-2">
               Posted on:{" "}
-              {new Date(meal.postTime).toLocaleString(undefined, {
+              {new Date(meal.date || meal.postTime).toLocaleString(undefined, {
                 dateStyle: "medium",
                 timeStyle: "short",
               })}
@@ -91,86 +173,94 @@ const MealDetailPage = () => {
                 <FaStar
                   key={i}
                   className={`${
-                    i < Math.round(meal.rating)
+                    i < Math.round(meal.rating || 0)
                       ? "fill-current"
                       : "text-gray-300"
                   }`}
                 />
               ))}
               <span className="text-gray-700 font-medium">
-                {meal.rating.toFixed(1)}
+                {(meal.rating || 0).toFixed(1)}
               </span>
             </div>
           </div>
 
           <div className="flex flex-col md:flex-row gap-4">
             <button
-              onClick={handleLike}
-              className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-[#FFCB74] rounded-full "
+              onClick={handleLikeToggle}
+              className={`flex items-center justify-center gap-2 px-6 py-3 border-2 rounded-full ${
+                liked ? "border-red-500 text-red-600" : "border-[#FFCB74]"
+              }`}
             >
-              <FaHeart /> {likes} Like{likes !== 1 ? "s" : ""}
+              <FaHeart /> {likes} {liked ? "Liked" : "Like"}
             </button>
-            <button
-              onClick={handleRequestMeal}
-              className="flex-1 px-6 py-3 bg-black text-white border-2 border-black  outline-4 outline-offset-4 rounded-full active:scale-95 transition"
-            >
-              Request Meal
-            </button>
+
+            {meal.state === "upcoming" ? (
+              <button
+                className="flex-1 px-6 py-3 bg-red-600 text-white border-2 rounded-full"
+                disabled
+              >
+                Upcoming
+              </button>
+            ) : (
+              <button
+                onClick={handleRequestMeal}
+                className={`flex-1 px-6 py-3 ${
+                  requested ? "bg-yellow-500" : "bg-black"
+                } text-white border-2 border-black rounded-full`}
+              >
+                {requested ? "Requested" : "Request Meal"}
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Reviews */}
       <div className="bg-white rounded-3xl shadow-lg p-6 mt-10">
-  <h2 className="text-2xl md:text-3xl font-bold mb-6">
-    Reviews ({reviews.length})
-  </h2>
-
-  {/* Write review box */}
-  <div className="mb-8">
-    <textarea
-      value={newReview}
-      onChange={(e) => setNewReview(e.target.value)}
-      placeholder="Write your review..."
-      className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-black outline-none transition"
-      rows={4}
-    />
-    <button
-      onClick={handlePostReview}
-      className="mt-4 px-6 py-3 bg-black text-white border-2 border-black rounded-md md:rounded-full w-full md:w-fit hover:bg-gray-900 transition active:scale-95"
-    >
-      Post Review
-    </button>
-  </div>
-
-  {/* Reviews list */}
-  <div className="space-y-5">
-    {reviews.map((r) => (
-      <div
-        key={r.id}
-        className="flex flex-col sm:flex-row sm:items-start gap-4 p-5 bg-gray-50 border border-gray-200 rounded-2xl"
-      >
-        {/* Avatar */}
-        <img
-          src={`https://i.pravatar.cc/40?u=${r.id}`}
-          alt={r.user}
-          className="w-12 h-12 rounded-full object-cover shadow"
-        />
-
-        {/* Text block */}
-        <div className="flex-1">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
-            <p className="font-semibold text-gray-900">{r.user}</p>
-            <span className="text-xs text-gray-500">
-              {new Date().toLocaleDateString()}
-            </span>
-          </div>
-          <p className="text-gray-700 mt-2 leading-relaxed">{r.text}</p>
+        <h2 className="text-2xl md:text-3xl font-bold mb-6">
+          Reviews ({reviews.length})
+        </h2>
+        <div className="mb-8">
+          <textarea
+            value={newReview}
+            onChange={(e) => setNewReview(e.target.value)}
+            placeholder="Write your review..."
+            className="w-full border border-gray-300 rounded-xl p-4 focus:ring-2 focus:ring-black outline-none transition"
+            rows={4}
+          />
+          <button
+            onClick={handlePostReview}
+            className="mt-4 px-6 py-3 bg-black text-white border-2 border-black rounded-md md:rounded-full w-full md:w-fit hover:bg-gray-900 transition active:scale-95"
+          >
+            Post Review
+          </button>
+        </div>
+        <div className="space-y-5">
+          {reviews.map((r, index) => (
+            <div
+              key={index}
+              className="flex flex-col sm:flex-row sm:items-start gap-4 p-5 bg-gray-50 border border-gray-200 rounded-2xl"
+            >
+              <img
+                src={r.image}
+                alt={r.displayName}
+                className="w-12 h-12 rounded-full object-cover shadow"
+              />
+              <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
+                  <p className="font-semibold text-gray-900">
+                    {r.displayName}
+                  </p>
+                  <span className="text-xs text-gray-500">
+                    {new Date(r.date).toLocaleDateString()}
+                  </span>
+                </div>
+                <p className="text-gray-700 mt-2 leading-relaxed">{r.text}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    ))}
-  </div>
-</div>
     </div>
   );
 };

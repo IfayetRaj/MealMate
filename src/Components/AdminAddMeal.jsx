@@ -16,7 +16,7 @@ const AdminAddMeal = () => {
 
     const form = e.target;
     const title = form.title.value;
-    const category = form.category.value;
+    const category = form.category.value; // dropdown value
     const image = form.image.files[0];
     const ingredients = form.ingredients.value;
     const description = form.description.value;
@@ -33,7 +33,7 @@ const AdminAddMeal = () => {
     formData.append("image", image);
 
     try {
-      // Upload image to imgbb using axios
+      // Upload image to imgbb
       const imgRes = await axios.post(
         `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
         formData
@@ -51,14 +51,17 @@ const AdminAddMeal = () => {
           date,
           email: userData.email,
           displayName: userData.displayName,
+          reviews: 0,
+          likes: 0,
+          rating: 0,
         };
 
-        // Send mealData to your backend with axios
+        // Send to backend
         const backendRes = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/meals`,
           mealData
         );
-        
+
         if (backendRes.data.success) {
           toast.success("Meal added successfully!");
           form.reset();
@@ -74,27 +77,92 @@ const AdminAddMeal = () => {
     }
   };
 
-
   return (
     <section className="bg-white rounded-3xl shadow-lg p-8 my-5 md:my-8">
-        <h3 className="text-2xl font-bold mb-6 text-gray-800">Add Meal</h3>
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleFromSubmit}>
-          <input type="text" placeholder="Title" className="border p-3 rounded-xl focus:ring-2 ring-black" name='title'/>
-          <input type="text" placeholder="Category" className="border p-3 rounded-xl focus:ring-2 ring-black" name='category'/>
-          <input type="file" placeholder="Image" className="border p-3 rounded-xl focus:ring-2 ring-black" name='image'/>
-          <input type="text" placeholder="Ingredients" className="border p-3 rounded-xl focus:ring-2 ring-black" name='ingredients'/>
-          <textarea placeholder="Description" className="border p-3 rounded-xl md:col-span-2 focus:ring-2 ring-black" name='description'></textarea>
-          <input type="number" placeholder="Price" className="border p-3 rounded-xl focus:ring-2 ring-black" name='price'/>
-          <input type="text" placeholder="Distributor name" className="border p-3 rounded-xl focus:ring-2 ring-black" name='distributorName'/>
-          <input type="datetime-local" className="border p-3 rounded-xl focus:ring-2 ring-black" name='date'/>
-          <input type="text" value={userData.displayName} readOnly className="border p-3 rounded-xl bg-gray-100 text-gray-500" />
-          <input type="text" value={userData.email} readOnly className="border p-3 rounded-xl bg-gray-100 text-gray-500" />
-          <button className="px-6 py-3 bg-black text-white border-2 border-black  outline-4 outline-offset-4 rounded-xl hover:bg-gray-800 transition md:col-span-2">
-            Add Meal
-          </button>
-        </form>
-      </section>
-  )
-}
+      <h3 className="text-2xl font-bold mb-6 text-gray-800">Add Meal</h3>
+      <form
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        onSubmit={handleFromSubmit}
+      >
+        <input
+          type="text"
+          placeholder="Title"
+          className="border p-3 rounded-xl focus:ring-2 ring-black"
+          name="title"
+          required
+        />
 
-export default AdminAddMeal
+        {/* Category dropdown */}
+        <select
+          name="category"
+          className="border p-3 rounded-xl focus:ring-2 ring-black"
+          required
+        >
+          <option value="">Select category</option>
+          <option value="Breakfast">Breakfast</option>
+          <option value="Lunch">Lunch</option>
+          <option value="Dinner">Dinner</option>
+        </select>
+
+        <input
+          type="file"
+          placeholder="Image"
+          className="border p-3 rounded-xl focus:ring-2 ring-black"
+          name="image"
+          required
+        />
+        <input
+          type="text"
+          placeholder="Ingredients (comma separated)"
+          className="border p-3 rounded-xl focus:ring-2 ring-black"
+          name="ingredients"
+          required
+        />
+        <textarea
+          placeholder="Description"
+          className="border p-3 rounded-xl md:col-span-2 focus:ring-2 ring-black"
+          name="description"
+          required
+        ></textarea>
+        <input
+          type="number"
+          placeholder="Price"
+          className="border p-3 rounded-xl focus:ring-2 ring-black"
+          name="price"
+          step="0.01"
+          required
+        />
+        <input
+          type="text"
+          placeholder="Distributor name"
+          className="border p-3 rounded-xl focus:ring-2 ring-black"
+          name="distributorName"
+          required
+        />
+        <input
+          type="datetime-local"
+          className="border p-3 rounded-xl focus:ring-2 ring-black"
+          name="date"
+          required
+        />
+        <input
+          type="text"
+          value={userData.displayName}
+          readOnly
+          className="border p-3 rounded-xl bg-gray-100 text-gray-500"
+        />
+        <input
+          type="text"
+          value={userData.email}
+          readOnly
+          className="border p-3 rounded-xl bg-gray-100 text-gray-500"
+        />
+        <button className="px-6 py-3 bg-black text-white border-2 border-black outline-4 outline-offset-4 rounded-xl hover:bg-gray-800 transition md:col-span-2">
+          Add Meal
+        </button>
+      </form>
+    </section>
+  );
+};
+
+export default AdminAddMeal;

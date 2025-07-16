@@ -17,7 +17,6 @@ const Navbar = () => {
       });
   };
 
-  console.log(userData);
 
   const links = (
     <>
