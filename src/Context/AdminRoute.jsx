@@ -8,7 +8,7 @@ const AdminRoute = ({children}) => {
   if(loading){
     return <LoadingPage></LoadingPage>
   }
-  if(userData && userData.role === "admin"){
+  if(userData?.role === "admin"){
     return children;
   }
   return <Navigate to='/signin'></Navigate>

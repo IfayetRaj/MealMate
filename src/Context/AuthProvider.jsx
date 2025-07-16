@@ -20,32 +20,33 @@ const AuthProvider = ({ children }) => {
   // observer
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
+      if (currentUser) {
+        setUser(currentUser);
+        try {
+          const res = await axios.get(`http://localhost:3000/user/${currentUser.email.toLowerCase()}`);
+          setUserData(res.data); 
+        } catch (err) {
+          console.error(err);
+          setUserData(null);
+        }
+      } else {
+        setUser(null);
+        setUserData(null);
+      }
+      setLoading(false); 
     });
+  
     return () => unsubscribe();
   }, []);
 
-// User data fromm backend
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (user?.email) {
-        try {
-          const res = await axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/user/${user.email}`,
-          );
-          setUserData(res.data);
-        } catch (err) {
-          console.error("Error fetching user data:", err);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchUserData();
-  }, [user]);
   console.log(userData);
+
+
+
+
+
+
+
 
   // create user with email and password
 
