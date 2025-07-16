@@ -52,7 +52,6 @@ const SignUpPage = () => {
       // Get Firebase ID token
       // const idToken = await user.getIdToken();
   
-      // 🔹 5️⃣ Send user to backend (MongoDB)
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/users`,
         {

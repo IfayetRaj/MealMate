@@ -11,6 +11,7 @@ import CheckoutPage from "../Pages/CheckoutPage";
 import MealDetailPage from "../Pages/MealDetailPage";
 import PrivateRoute from "../Context/PrivateRoute";
 import AdminRoute from "../Context/AdminRoute";
+import UserRoute from "../Context/UserRoute";
 
 const router = createBrowserRouter([
   {
@@ -44,7 +45,9 @@ const router = createBrowserRouter([
         path: "/user-dashboard",
         element: (
           <PrivateRoute>
-            <UserDashboardPage></UserDashboardPage>
+            <UserRoute>
+              <UserDashboardPage></UserDashboardPage>
+            </UserRoute>
           </PrivateRoute>
         ),
       },
