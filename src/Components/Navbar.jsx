@@ -1,27 +1,21 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { NavLink, Link } from "react-router";
 import { CiUser } from "react-icons/ci";
 import { AuthContext } from "../Context/AuthContext";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
-  const { user,logOutUser } = useContext(AuthContext);
-
-  const [ loggedInUser, setLoggedInUser ] = useState(user);
-
-  const handleLogout = () =>{
+  const { user, logOutUser, userData } = useContext(AuthContext);
+  const handleLogout = () => {
     logOutUser()
-    .then(()=>{
-      setLoggedInUser(null);
-      toast.success("Successfully logged out!");
-    })
-    .catch((error) => {
-      console.error("Logout failed:", error);
-      toast.error("Failed to log out. Please try again.");
-    });
-  }
-
-
+      .then(() => {
+        toast.success("Successfully logged out!");
+      })
+      .catch((error) => {
+        console.error("Logout failed:", error);
+        toast.error("Failed to log out. Please try again.");
+      });
+  };
 
   const links = (
     <>
@@ -87,9 +81,7 @@ const Navbar = () => {
         <ul className="menu menu-horizontal px-1">{links}</ul>
       </div>
       <div className="navbar-end">
-
-
-        {loggedInUser? (
+        {user ? (
           <div className="dropdown dropdown-end">
             <div
               tabIndex={0}
@@ -97,10 +89,7 @@ const Navbar = () => {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-13 rounded-full ring ring-blue-400 ring-offset-base-100 ring-offset-2 transition duration-300">
-                <img
-                  alt="User Avatar"
-                  src={loggedInUser.photoURL}
-                />
+                <img alt="User Avatar" src={user.photoURL} />
               </div>
             </div>
             <ul
@@ -108,10 +97,17 @@ const Navbar = () => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
             >
               <li>
-                <p className="justify-between bg-black text-white font-semibold">{loggedInUser.displayName}</p>
+                <p className="justify-between bg-black text-white font-semibold">
+                  {user.displayName}
+                </p>
               </li>
               <li>
-                <Link to="/user-dashboard">Dashboard</Link>
+                {userData &&
+                  (userData.role === "admin" ? (
+                    <Link to="/admin-dashboard">Admin Dashboard</Link>
+                  ) : (
+                    <Link to="/user-dashboard">User Dashboard</Link>
+                  ))}
               </li>
               <li>
                 <button onClick={handleLogout}>Logout</button>

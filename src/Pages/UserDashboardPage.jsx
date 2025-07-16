@@ -1,105 +1,95 @@
-import React from "react";
+import React, { useContext } from "react";
+import { AuthContext } from "../Context/AuthContext";
+
 
 const UserDashboardPage = () => {
-  // Dummy user data
-  const user = {
-    name: "John Doe",
-    email: "johndoe@example.com",
-    image: "https://via.placeholder.com/100",
-    badges: ["Bronze"],
-  };
+  const { userData ,loading} = useContext(AuthContext);
 
-  // Dummy payments data
+
+  // useEffect(() => {
+  //   const fetchUserData = async () => {
+  //     if (user?.email) {
+  //       try {
+  //         const res = await axios.get(
+  //           `${import.meta.env.VITE_BACKEND_URL}/user/${user.email}`,
+  //         );
+  //         setUserData(res.data);
+  //       } catch (err) {
+  //         console.error("Error fetching user data:", err);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     }
+  //   };
+
+  //   fetchUserData();
+  // }, [user]);
+
+  console.log(userData);
+
   const payments = [
-    {
-      id: 1,
-      date: "2025-07-15",
-      amount: 25.5,
-      status: "Completed",
-      transactionId: "TXN123456",
-    },
-    {
-      id: 2,
-      date: "2025-06-30",
-      amount: 15.0,
-      status: "Completed",
-      transactionId: "TXN654321",
-    },
+    { id: 1, date: "2025-07-15", amount: 25.5, status: "Completed", transactionId: "TXN123456" },
+    { id: 2, date: "2025-06-30", amount: 15.0, status: "Completed", transactionId: "TXN654321" },
   ];
 
-  // Dummy requested meals data
   const requestedMeals = [
-    {
-      id: 1,
-      title: "Spaghetti Bolognese",
-      likes: 120,
-      reviewsCount: 35,
-      status: "Pending",
-    },
-    {
-      id: 2,
-      title: "Chicken Curry",
-      likes: 90,
-      reviewsCount: 20,
-      status: "Approved",
-    },
+    { id: 1, title: "Spaghetti Bolognese", likes: 120, reviewsCount: 35, status: "Pending" },
+    { id: 2, title: "Chicken Curry", likes: 90, reviewsCount: 20, status: "Approved" },
   ];
 
-  // Dummy reviews data
   const reviews = [
-    {
-      id: 1,
-      title: "Spaghetti Bolognese",
-      likes: 15,
-      review: "Delicious and hearty!",
-    },
-    {
-      id: 2,
-      title: "Chicken Curry",
-      likes: 10,
-      review: "Loved the spices.",
-    },
+    { id: 1, title: "Spaghetti Bolognese", likes: 15, review: "Delicious and hearty!" },
+    { id: 2, title: "Chicken Curry", likes: 10, review: "Loved the spices." },
   ];
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4">
+        <p>Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="container mx-auto p-4">
+        <p>Could not load user data.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 space-y-8 py-10 md:pb-20">
       {/* My Profile */}
-      <section className="relative bg-white shadow-lg my-5 md:my-8  rounded-2xl  overflow-hidden mb-6">
-        {/* Black cover inside the card */}
+      <section className="relative bg-white shadow-lg my-5 md:my-8 rounded-2xl overflow-hidden mb-6">
         <div className="absolute top-0 left-0 w-full h-1/3 md:hidden bg-[#B38B59]"></div>
 
-        {/* Content */}
         <div className="relative flex flex-col md:flex-row items-center gap-6 p-6">
-        <img
-          src="https://i.postimg.cc/mgR5W8X9/Screenshot-2025-07-15-at-3-21-41-PM.png"
-          alt="Admin"
-          className="w-30 h-30 md:w-32 md:h-32 rounded-full object-cover shadow-lg border-4 border-white"
-        />
+          <img
+            src={userData.photoURL}
+            alt="User"
+            className="w-30 h-30 md:w-32 md:h-32 rounded-full object-cover shadow-lg border-4 border-white"
+          />
           <div className="flex-1 text-center md:text-left">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-              {user.name}
+              {userData.displayName}
             </h2>
-            <p className="text-gray-600">{user.email}</p>
+            <p className="text-gray-600">{userData.email}</p>
             <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
-              {user.badges.map((badge) => (
-                <span
-                  key={badge}
-                  className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium"
-                >
-                  {badge}
-                </span>
-              ))}
+              <span className="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                Badge: {userData.badge}
+              </span>
             </div>
           </div>
         </div>
       </section>
 
       {/* Requested Meals */}
-      <section className="bg-white shadow-lg my-5 md:my-8  rounded-2xl  p-6 overflow-x-auto">
+      <section className="bg-white shadow-lg my-5 md:my-8 rounded-2xl p-6 overflow-x-auto">
         <h3 className="text-xl font-semibold mb-4">Requested Meals</h3>
         <table className="w-full border-collapse text-left">
           <thead>
-            <tr className="bg-gray-100 ">
+            <tr className="bg-gray-100">
               <th className="p-3 md:p-4">Title</th>
               <th className="p-3 md:p-4">Likes</th>
               <th className="p-3 md:p-4">Reviews</th>
@@ -126,7 +116,7 @@ const UserDashboardPage = () => {
       </section>
 
       {/* My Reviews */}
-      <section className="bg-white shadow-lg my-5 md:my-8  rounded-2xl  p-6 overflow-x-auto">
+      <section className="bg-white shadow-lg my-5 md:my-8 rounded-2xl p-6 overflow-x-auto">
         <h3 className="text-xl font-semibold mb-4">My Reviews</h3>
         <table className="w-full min-w-[600px] border-collapse">
           <thead>
@@ -163,12 +153,12 @@ const UserDashboardPage = () => {
       </section>
 
       {/* Payment History */}
-      <section className="bg-white shadow-lg my-5 md:my-8  rounded-2xl  p-6 overflow-x-auto">
+      <section className="bg-white shadow-lg my-5 md:my-8 rounded-2xl p-6 overflow-x-auto">
         <h3 className="text-xl font-semibold mb-4">Payment History</h3>
         {payments.length > 0 ? (
           <table className="w-full min-w-[600px] border-collapse text-left">
             <thead>
-              <tr className="bg-gray-100 ">
+              <tr className="bg-gray-100">
                 <th className="p-4 md:p-3">Date</th>
                 <th className="p-4 md:p-3">Amount</th>
                 <th className="p-4 md:p-3">Status</th>

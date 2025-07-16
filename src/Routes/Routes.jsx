@@ -10,6 +10,7 @@ import UserDashboardPage from "../Pages/UserDashboardPage";
 import CheckoutPage from "../Pages/CheckoutPage";
 import MealDetailPage from "../Pages/MealDetailPage";
 import PrivateRoute from "../Context/PrivateRoute";
+import AdminRoute from "../Context/AdminRoute";
 
 const router = createBrowserRouter([
   {
@@ -33,7 +34,9 @@ const router = createBrowserRouter([
         path: "/admin-dashboard",
         element: (
           <PrivateRoute>
-            <AdminDashboardPage></AdminDashboardPage>
+            <AdminRoute>
+              <AdminDashboardPage></AdminDashboardPage>
+            </AdminRoute>
           </PrivateRoute>
         ),
       },

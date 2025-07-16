@@ -3,58 +3,80 @@ import SocialLogin from "../Components/SocialLogin";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../Context/AuthContext";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
 const SignUpPage = () => {
   const { createUser, updateUserProfile } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // handel from submit
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
-    const from = event.target;
-    const name = from.name.value;
-    const email = from.email.value;
-    const password = from.password.value;
-    const photo = from.photo.files[0];
+    const form = event.target;
+  
+    const name = form.name.value;
+    const email = form.email.value;
+    const password = form.password.value;
+    const photo = form.photo.files[0];
+  
     console.log({ name, email, password, photo });
-
-    // uploading to IngBB
-    const formData = new FormData();
-    formData.append("image", photo);
-
-    fetch(
-      `https://api.imgbb.com/1/upload?key=${
-        import.meta.env.VITE_IMGBB_API_KEY
-      }`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-
-          const photoURL = data.data.display_url;
-          console.log("Photo uploaded successfully", photoURL);
-
-          // creating user
-          createUser(email, password)
-            .then(() => {
-              updateUserProfile(name, photoURL)
-              ;
-              toast.success("User created successfully");
-              navigate('/'); 
-              from.reset();
-            })
-            .catch((error) => {
-              toast.error(`Failed to create user${error.message}`);
-            });
-        } else {
-          console.error("Failed to upload photo", data);
+  
+    try {
+      const formData = new FormData();
+      formData.append("image", photo);
+  
+      const res = await fetch(
+        `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+        {
+          method: "POST",
+          body: formData,
         }
-      });
-
+      );
+  
+      const data = await res.json();
+  
+      if (!data.success) {
+        throw new Error("Photo upload failed");
+      }
+  
+      const photoURL = data.data.display_url;
+      console.log("Photo uploaded successfully:", photoURL);
+  
+      // Create Firebase user
+      const result = await createUser(email, password);
+      const user = result.user;
+  
+      // Update Firebase profile
+      await updateUserProfile(name, photoURL);
+  
+      // Get Firebase ID token
+      // const idToken = await user.getIdToken();
+  
+      // 🔹 5️⃣ Send user to backend (MongoDB)
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/users`,
+        {
+          // uid: user.uid,
+          email: user.email,
+          displayName: name,
+          photoURL: photoURL,
+          role: "user",
+          badge: "bronze",
+        },
+        // {
+        //   headers: {
+        //     Authorization: `Bearer ${idToken}`,
+        //   },
+        // }
+      );
+  
+      toast.success("User created successfully and saved to DB");
+      navigate("/");
+      form.reset();
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(`Error: ${error.message}`);
+    }
   };
 
   return (

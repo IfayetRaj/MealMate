@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
+import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -13,17 +14,38 @@ import { auth, provider } from "../Firebase/Firebase.init";
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
+  console.log(user);
 
   // observer
   useEffect(() => {
-    const observer = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       setLoading(false);
     });
-    return () => {
-      observer(); // unsubscribe from the observer when the component unmounts
-    };
+    return () => unsubscribe();
   }, []);
+
+// User data fromm backend
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user?.email) {
+        try {
+          const res = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/user/${user.email}`,
+          );
+          setUserData(res.data);
+        } catch (err) {
+          console.error("Error fetching user data:", err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+  console.log(userData);
 
   // create user with email and password
 
@@ -49,7 +71,7 @@ const AuthProvider = ({ children }) => {
     return updateProfile(auth.currentUser, {
       displayName: name,
       photoURL: photoURL,
-    })
+    });
   };
 
   // creating user with google sign in
@@ -59,6 +81,7 @@ const AuthProvider = ({ children }) => {
   };
 
   const userInfo = {
+    userData,
     user,
     loading,
     createUser,

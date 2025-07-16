@@ -20,12 +20,12 @@ const Card = () => {
         </h3>
         <p className="text-sm">Orange Ginger Dressing</p>
 
-        <div className="flex gap-3 mt-3 text-sm text-gray-300">
+        <div className="gap-3 mt-3 text-sm text-gray-300 flex flex-col md:flex-row">
           <span className="bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-            30 mins
+            Rating: 
           </span>
           <span className="bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-            150k views
+            Loved by: 
           </span>
         </div>
       </div>
