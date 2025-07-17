@@ -1,6 +1,13 @@
 import React from "react";
+import toast from "react-hot-toast";
 
 const Suggestion = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    toast.success("Thanks for your valuable suggestion! It will help us improve more.");
+    e.target.reset(); // ✅ clear the textarea after submit
+  };
+
   return (
     <div className="relative w-full min-h-[300px] bg-black flex items-center justify-center px-4 md:py-18 py-4 overflow-hidden">
       {/* Background Video */}
@@ -11,7 +18,6 @@ const Suggestion = () => {
         playsInline
         className="absolute inset-0 w-full h-full object-cover opacity-30"
         src="/bg.mp4"
-
       />
 
       {/* Glass Card */}
@@ -22,11 +28,11 @@ const Suggestion = () => {
         <p className="text-gray-300 text-center mb-6">
           We’d love to hear how we can improve your experience.
         </p>
-        <form className="flex flex-col gap-4">
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <textarea
-            type="feedback"
             placeholder="Your suggestion..."
-            className=" w-full h-40 resize-none px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none backdrop-blur-sm mb-9 "
+            className="w-full h-40 resize-none px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/70 focus:outline-none backdrop-blur-sm mb-9"
+            required
           />
           <button
             type="submit"

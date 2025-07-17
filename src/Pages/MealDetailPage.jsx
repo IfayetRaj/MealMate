@@ -54,51 +54,60 @@ const MealDetailPage = () => {
 
   const handleLikeToggle = async () => {
     const action = liked ? "dislike" : "like";
+  
     try {
-      await axios.patch(
+      const res = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/meals/${id}/like`,
         { action }
       );
+  
       setLikes((prev) => prev + (action === "like" ? 1 : -1));
       setLiked(!liked);
+  
+      if (res.data.released) {
+        toast.success("🎉 This upcoming meal has been released!");
+      }
     } catch (err) {
       console.error("Failed to toggle like:", err);
+      if (err.response?.data?.error) {
+        toast.error(`Error: ${err.response.data.error}`);
+      } else {
+        toast.error("Failed to update like. Please try again.");
+      }
     }
   };
 
+  // this one-----------------------------------------------------
+  const handleRequestMeal = async () => {
+    const data = {
+      userName: userData.displayName,
+      userEmail: userData.email,
+      mealId: meal._id,
+      mealTitle: meal.title,
+      mealLikes: meal.likes,
+      mealPrice: meal.price,
+      status: "pending",
+    };
 
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/request-meal`,
+        data
+      );
 
-// this one-----------------------------------------------------
-const handleRequestMeal = async () => {
-  const data = {
-    userName: userData.displayName,
-    userEmail: userData.email,
-    mealId: meal._id,
-    mealTitle: meal.title,
-    mealLikes: meal.likes,
-    mealPrice: meal.price,
-    status: "pending",
-  };
+      console.log("Response:", response.data);
 
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/request-meal`,
-      data
-    );
-
-    console.log("Response:", response.data);
-
-    if (response.data.success) {
-      setRequested(true);
-      toast.success("Meal requested successfully");
-    } else {
-      toast.error("You have already requested this meal.");
+      if (response.data.success) {
+        setRequested(true);
+        toast.success("Meal requested successfully");
+      } else {
+        toast.error("You have already requested this meal.");
+      }
+    } catch (error) {
+      console.error("Error requesting meal:", error);
+      toast.error("Something went wrong while requesting the meal.");
     }
-  } catch (error) {
-    console.error("Error requesting meal:", error);
-    toast.error("Something went wrong while requesting the meal.");
-  }
-};
+  };
 
   const handlePostReview = async () => {
     if (!newReview.trim()) return;
@@ -115,7 +124,10 @@ const handleRequestMeal = async () => {
     };
 
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/reviews`, reviewData);
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/reviews`,
+        reviewData
+      );
       setReviews([
         { ...reviewData, date: new Date().toISOString() },
         ...reviews,
@@ -189,16 +201,27 @@ const handleRequestMeal = async () => {
           </div>
 
           <div className="flex flex-col md:flex-row gap-4">
-            <button
-              onClick={handleLikeToggle}
-              className={`flex items-center justify-center gap-2 px-6 py-3 border-2 rounded-full ${
-                liked ? "border-red-500 text-red-600" : "border-[#FFCB74]"
-              }`}
-            >
-              <FaHeart /> {likes} {liked ? "Liked" : "Like"}
-            </button>
+            {meal.status === "upcoming" && userData.badge === "bronze" ? (
+              <p className="inline-block bg-gradient-to-r from-black to-gray-800 text-white px-4 py-2 rounded-full text-sm font-medium shadow">
+                ⚠️ Upgrade your badge to like this upcoming meal!
+              </p>
+            ) : (
+              <button
+                onClick={handleLikeToggle}
+                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full border-2 transition-all duration-200 ${
+                  liked
+                    ? "border-red-500 text-red-600 hover:bg-red-50"
+                    : "border-yellow-400 text-gray-800 hover:bg-yellow-50"
+                }`}
+              >
+                <FaHeart className="text-xl" />
+                <span className="font-semibold">
+                  {likes} {liked ? "Liked" : "Like"}
+                </span>
+              </button>
+            )}
 
-            {meal.state === "upcoming" ? (
+            {meal.status === "upcoming" ? (
               <button
                 className="flex-1 px-6 py-3 bg-red-600 text-white border-2 rounded-full"
                 disabled
@@ -251,9 +274,7 @@ const handleRequestMeal = async () => {
               />
               <div className="flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
-                  <p className="font-semibold text-gray-900">
-                    {r.displayName}
-                  </p>
+                  <p className="font-semibold text-gray-900">{r.displayName}</p>
                   <span className="text-xs text-gray-500">
                     {new Date(r.date).toLocaleDateString()}
                   </span>

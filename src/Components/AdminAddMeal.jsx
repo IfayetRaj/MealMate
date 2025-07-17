@@ -24,6 +24,7 @@ const AdminAddMeal = () => {
     const distributorName = form.distributorName.value;
     const date = form.date.value;
 
+
     if (!image) {
       toast.error("Please select an image.");
       return;
@@ -54,6 +55,7 @@ const AdminAddMeal = () => {
           reviews: 0,
           likes: 0,
           rating: 0,
+          status: "ongoing"
         };
 
         // Send to backend

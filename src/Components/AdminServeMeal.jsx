@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+
 const AdminServeMeal = () => {
   const [requestedMeals, setRequestedMeals] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const mealsPerPage = 10;
 
   useEffect(() => {
     const fetchRequestedMeals = async () => {
@@ -26,10 +29,31 @@ const AdminServeMeal = () => {
         { status: "Served" }
       );
       toast.success("Meal marked as served!");
+
+      // Update local list immediately
+      setRequestedMeals((prevMeals) =>
+        prevMeals.map((meal) =>
+          meal._id === id ? { ...meal, status: "Served" } : meal
+        )
+      );
     } catch (error) {
       console.error("Error updating meal status:", error);
       toast.error("Failed to update meal status");
     }
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(requestedMeals.length / mealsPerPage);
+  const indexOfLastMeal = currentPage * mealsPerPage;
+  const indexOfFirstMeal = indexOfLastMeal - mealsPerPage;
+  const currentMeals = requestedMeals.slice(indexOfFirstMeal, indexOfLastMeal);
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
   return (
@@ -46,8 +70,8 @@ const AdminServeMeal = () => {
           </tr>
         </thead>
         <tbody>
-          {requestedMeals.map((meal) => (
-            <tr key={meal.id} className="border-b hover:bg-gray-50">
+          {currentMeals.map((meal) => (
+            <tr key={meal._id} className="border-b hover:bg-gray-50">
               <td className="p-3 md:p-4">{meal.mealTitle}</td>
               <td className="p-3 md:p-4">{meal.userEmail}</td>
               <td className="p-3 md:p-4">{meal.userName}</td>
@@ -57,13 +81,17 @@ const AdminServeMeal = () => {
                   onClick={() => handleOnclick(meal._id)}
                   disabled={meal.status === "Served"}
                   className={`px-4 md:px-6 py-2 rounded-3xl border-2 
-    ${
-      meal.status === "Served"
-        ? "bg-green-400 border-none"
-        : "bg-black border-black"
-    } 
-    text-white font-semibold active:scale-95 
-    ${meal.status === "Served" ? "cursor-not-allowed opacity-70" : ""}`}
+                    ${
+                      meal.status === "Served"
+                        ? "bg-green-400 border-none"
+                        : "bg-black border-black"
+                    } 
+                    text-white font-semibold active:scale-95 
+                    ${
+                      meal.status === "Served"
+                        ? "cursor-not-allowed opacity-70"
+                        : ""
+                    }`}
                 >
                   {meal.status === "Served" ? "Served" : "Serve"}
                 </button>
@@ -72,6 +100,37 @@ const AdminServeMeal = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-6">
+        <button
+          onClick={handlePrev}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-full ${
+            currentPage === 1
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          Prev
+        </button>
+
+        <p className="text-gray-700">
+          Page {currentPage} of {totalPages}
+        </p>
+
+        <button
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded-full ${
+            currentPage === totalPages
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          Next
+        </button>
+      </div>
     </section>
   );
 };

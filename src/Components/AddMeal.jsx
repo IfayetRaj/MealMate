@@ -14,7 +14,8 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
     email: adminEmail,
     displayName: adminName,
     likes: 0,
-    rating: 0
+    rating: 0,
+    status: "upcoming"
   });
 
   const [uploading, setUploading] = useState(false);

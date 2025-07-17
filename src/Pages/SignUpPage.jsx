@@ -62,11 +62,7 @@ const SignUpPage = () => {
           role: "user",
           badge: "bronze",
         },
-        // {
-        //   headers: {
-        //     Authorization: `Bearer ${idToken}`,
-        //   },
-        // }
+        
       );
   
       toast.success("User created successfully and saved to DB");

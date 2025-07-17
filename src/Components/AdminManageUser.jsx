@@ -1,28 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { AuthContext } from "../Context/AuthContext";
 
 const AdminManageUser = () => {
+  const { userData } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [searchEmail, setSearchEmail] = useState("");
 
-  // Fetch 5 recent users initially
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 10;
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/recent`);
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/users/recent/${userData.email}`
+        );
         setUsers(res.data);
       } catch (error) {
         console.error(error);
         toast.error("Failed to fetch users");
       }
     };
-    fetchUsers();
-  }, []);
+    if (userData?.email) {
+      fetchUsers();
+    }
+  }, [userData?.email]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
     if (!searchEmail) return;
+
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/users/search?email=${encodeURIComponent(
@@ -30,11 +39,13 @@ const AdminManageUser = () => {
         )}`
       );
       setUsers(res.data);
+      setCurrentPage(1); 
     } catch (error) {
       console.error(error);
-      toast.error("User not found");
+      toast.error("User not found"); 
     }
   };
+
 
   const handleRoleToggle = async (id, currentRole) => {
     const newRole = currentRole === "admin" ? "user" : "admin";
@@ -43,17 +54,32 @@ const AdminManageUser = () => {
         role: newRole,
       });
       toast.success(`Role updated to ${newRole}`);
-      // Refresh the list:
+      // Refresh the list
       if (searchEmail) {
         handleSearch({ preventDefault: () => {} });
       } else {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/users/recent`);
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/users/recent/${userData.email}`
+        );
         setUsers(res.data);
       }
     } catch (error) {
       console.error(error);
       toast.error("Failed to update role");
     }
+  };
+
+  const totalPages = Math.ceil(users.length / usersPerPage);
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
   return (
@@ -87,7 +113,7 @@ const AdminManageUser = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {currentUsers.map((user) => (
             <tr key={user._id} className="border-b hover:bg-gray-50">
               <td className="p-3 md:p-4">{user.displayName}</td>
               <td className="p-3 md:p-4">{user.email}</td>
@@ -105,6 +131,37 @@ const AdminManageUser = () => {
           ))}
         </tbody>
       </table>
+
+      {/* ✅ Pagination Controls */}
+      <div className="flex justify-between items-center mt-6">
+        <button
+          onClick={handlePrev}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-full ${
+            currentPage === 1
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          Prev
+        </button>
+
+        <p className="text-gray-700">
+          Page {currentPage} of {totalPages}
+        </p>
+
+        <button
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded-full ${
+            currentPage === totalPages
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          Next
+        </button>
+      </div>
     </section>
   );
 };

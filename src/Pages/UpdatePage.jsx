@@ -63,6 +63,7 @@ const UpdatePage = () => {
         email: mealData.email,
         displayName: mealData.displayName,
         image: imageUrl,
+        status: "ongoing",
       };
 
       // 3️⃣ Send update request to backend

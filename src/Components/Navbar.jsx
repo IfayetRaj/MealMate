@@ -105,9 +105,9 @@ const Navbar = () => {
               <li>
                 {userData &&
                   (userData.role === "admin" ? (
-                    <Link to="/admin-dashboard">Admin Dashboard</Link>
+                    <NavLink to="/admin-dashboard">Admin Dashboard</NavLink>
                   ) : (
-                    <Link to="/user-dashboard">User Dashboard</Link>
+                    <NavLink to="/user-dashboard">User Dashboard</NavLink>
                   ))}
               </li>
               <li>
@@ -124,7 +124,7 @@ const Navbar = () => {
           </Link>
         )}
 
-        {/* Profile picture button */}
+
       </div>
     </div>
   );

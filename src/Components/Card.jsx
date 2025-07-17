@@ -1,16 +1,17 @@
 import React from "react";
 import { Link } from "react-router";
+import { CiHeart } from "react-icons/ci";
 
 const Card = ({ meal }) => {
   if (!meal) {
     return <div className="text-red-500">No meal data</div>;
   }
 
-  const { image, title, description, date, likes } = meal;
+  const { image, title, description,price, likes, } = meal;
 
   return (
     <Link to={`/meal-details/${meal._id}`}>
-      <div className="relative w-42 mx-auto md:w-72 rounded-2xl overflow-hidden shadow-2xl outline-2 outline-black outline-offset-3 border-2 border-black text-white hover:-translate-y-1.5 transition-all duration-200">
+      <div className="relative w-42 mx-auto md:w-78 rounded-2xl overflow-hidden shadow-2xl outline-2 outline-black outline-offset-3 border-2 border-black text-white hover:-translate-y-1.5 transition-all duration-200">
         {image ? (
           <img
             src={image}
@@ -35,10 +36,12 @@ const Card = ({ meal }) => {
 
           <div className="gap-3 mt-3 text-sm text-gray-300 flex flex-col md:flex-row">
             <span className="bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-              Date: {date || "N/A"}
+              Price: {price}
             </span>
+
+            
             <span className="bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
-              Loved by: {likes || 0}
+            <CiHeart className="inline-block mr-2" size={20}/>{likes || 0}
             </span>
           </div>
         </div>
