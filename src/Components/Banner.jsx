@@ -1,8 +1,37 @@
-import React from "react";
-import { motion } from "motion/react";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router"; 
 
 const Banner = () => {
-  
+  const [searchTitle, setSearchTitle] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = async () => {
+    if (!searchTitle.trim()) {
+      toast.error("Please enter a meal title");
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/meals/search?title=${encodeURIComponent(
+          searchTitle.trim()
+        )}`
+      );
+
+      if (res.data && res.data._id) {
+        // Navigate to meal detail page (update your route as needed)
+        navigate(`/meal-details/${res.data._id}`);
+      } else {
+        toast.error("Meal not found");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Meal not found");
+    }
+  };
 
   return (
     <section
@@ -11,10 +40,6 @@ const Banner = () => {
         backgroundImage: `url('/banner.png')`,
       }}
     >
-      {/* Background accents (optional) */}
-      <div className="absolute top-10 left-10 w-8 h-8 rounded-full border-2 border-black animate-spin-slow"></div>
-      <div className="absolute bottom-10 right-10 w-8 h-8 rounded-full border-2 border-black animate-pulse"></div>
-
       {/* Headline */}
       <motion.h1
         initial={{ opacity: 0, y: -50 }}
@@ -53,21 +78,21 @@ const Banner = () => {
         food experiences for every student — all in one place!
       </p>
 
-      {/* Email input */}
+      {/* Search input */}
       <div className="flex flex-col md:flex-row mt-8 gap-4 w-full md:w-auto px-2">
         <input
           type="text"
-          placeholder="Enter your email"
+          placeholder="Search meal by title"
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
           className="px-5 py-4 text-base md:text-sm rounded-full border border-gray-300 w-full md:w-96 focus:outline-none"
         />
-        <button className="px-8 py-4 md:py-3 bg-black text-white rounded-full hover:bg-gray-800 transition text-base md:text-sm">
+        <button
+          onClick={handleSearch}
+          className="px-8 py-4 md:py-3 bg-black text-white rounded-full hover:bg-gray-800 transition text-base md:text-sm"
+        >
           Send
         </button>
-      </div>
-
-      {/* Floating tag */}
-      <div className="absolute bottom-16 right-6 md:bottom-20 md:right-10 bg-black text-white px-4 py-2 rounded-full shadow-lg">
-        <button>Hi</button>
       </div>
     </section>
   );

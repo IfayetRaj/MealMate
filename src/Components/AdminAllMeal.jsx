@@ -64,9 +64,11 @@ const AdminAllMeal = () => {
               <td className="p-4">{meal.rating}</td>
               <td className="p-4">{meal.distributorName}</td>
               <td className="p-4 flex flex-wrap gap-2 flex-col md:flex-row">
+                <Link to={`/update-meal/${meal._id}`}>
                 <button className=" w-[150px] px-4 md:px-6 py-2 rounded-3xl border-2 bg-black text-white font-semibold border-black active:scale-95">
                   Update
                 </button>
+                </Link>
                 <button
                   onClick={() => handleDelete(meal._id)}
                   className="w-[150px] px-4  md:px-6 py-2 rounded-3xl bg-[#c72828f2] text-white font-semibold active:scale-95 hover:bg-red-600 transition"

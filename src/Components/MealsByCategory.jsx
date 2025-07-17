@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Card from "./Card";
-import { Link } from "react-router";
+import { Link } from "react-router"; 
 
 const MealsByCategory = () => {
   const [activeTab, setActiveTab] = useState("All");
@@ -24,12 +24,12 @@ const MealsByCategory = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-4 mb-20">
-      <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-6 text-center ">
+      <h2 className="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-6 text-center">
         Meals by Category
       </h2>
 
       <div className="flex justify-center gap-4 mb-8">
-        {["Breakfast", "Lunch", "Dinner", "All"].map((tab) => (
+        {["Breakfast", "Lunch", "Dinner"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}

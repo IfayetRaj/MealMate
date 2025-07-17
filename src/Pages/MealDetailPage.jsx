@@ -106,6 +106,9 @@ const handleRequestMeal = async () => {
     const reviewData = {
       mealId: id,
       displayName: user.displayName,
+      title: meal.title,
+      likes: meal.likes,
+      reviews: meal.reviews || 0,
       email: user.email,
       image: user.image,
       text: newReview.trim(),

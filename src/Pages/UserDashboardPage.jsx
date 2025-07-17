@@ -1,45 +1,133 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
-
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Link } from "react-router";
 
 const UserDashboardPage = () => {
-  const { userData ,loading} = useContext(AuthContext);
+  const { userData, loading } = useContext(AuthContext);
+
+  // getting requested meals based on my email from api
+  const [requestedMeals, setRequestedMeals] = useState([]);
+  const [reviews, setReviews] = useState([]);
+
+  // getting data from api
+
+  useEffect(() => {
+    if (!userData?.email) {
+      console.log("No user email yet");
+      return;
+    }
+    const fetching = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/requests/${userData.email}`
+        );
+        setRequestedMeals(response.data);
+      } catch (error) {
+        console.error("Error fetching requested meals:", error);
+        toast.error("Failed to fetch requested meals. Please try again later.");
+      }
+    };
+    fetching();
+  }, [userData?.email]);
 
 
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     if (user?.email) {
-  //       try {
-  //         const res = await axios.get(
-  //           `${import.meta.env.VITE_BACKEND_URL}/user/${user.email}`,
-  //         );
-  //         setUserData(res.data);
-  //       } catch (err) {
-  //         console.error("Error fetching user data:", err);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     }
-  //   };
+  // handle cancel request
+  const handleCancel = async (mealId) => {
+    
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/requests/${mealId}`,
+        {
+          data: { email: userData.email },
+        }
+      );
 
-  //   fetchUserData();
-  // }, [user]);
+      if (response.data.success) {
+        setRequestedMeals((prevMeals) =>
+          prevMeals.filter((meal) => meal._id !== mealId)
+        );
+        toast.success("Request cancelled successfully.");
+      } else {
+        toast.error("Failed to cancel request. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error cancelling request:", error);
+      toast.error("Failed to cancel request. Please try again later.");
+    }
+  }
 
-  console.log(userData);
+// getting reviews from api
+  useEffect(() => {
+    if (!userData?.email) {
+      console.log("No user email yet");
+      return;
+    }
+    const fetching = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/reviews/user/${userData.email}`
+        );
+        setReviews(response.data);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        toast.error("Failed to fetch reviews. Please try again later.");
+      }
+    };
+    fetching();
+  }, [userData?.email]); 
+
+// handeling delete
+const handleDelete = async (id) =>{
+  const confirmDelete = window.confirm("Are you sure you want to delete this review? This action cannot be undone.");
+  if (confirmDelete) {
+    // api
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/reviews/${id}`,
+        {
+          data: { email: userData.email },
+        }
+      );
+      if (response.data.success) {
+        setReviews((prevReviews) =>
+          prevReviews.filter((review) => review._id !== id)
+      );
+      toast.success("Review deleted successfully.");
+      } else {
+        toast.error("Failed to delete review. Please try again.");
+      }
+    }
+    catch (error) {
+      console.error("Error deleting review:", error);
+      toast.error("Failed to delete review. Please try again later.");
+    }
+  } else {
+    toast.error("Review deletion cancelled.");
+  }
+}
+
+
+
+
+
 
   const payments = [
-    { id: 1, date: "2025-07-15", amount: 25.5, status: "Completed", transactionId: "TXN123456" },
-    { id: 2, date: "2025-06-30", amount: 15.0, status: "Completed", transactionId: "TXN654321" },
-  ];
-
-  const requestedMeals = [
-    { id: 1, title: "Spaghetti Bolognese", likes: 120, reviewsCount: 35, status: "Pending" },
-    { id: 2, title: "Chicken Curry", likes: 90, reviewsCount: 20, status: "Approved" },
-  ];
-
-  const reviews = [
-    { id: 1, title: "Spaghetti Bolognese", likes: 15, review: "Delicious and hearty!" },
-    { id: 2, title: "Chicken Curry", likes: 10, review: "Loved the spices." },
+    {
+      id: 1,
+      date: "2025-07-15",
+      amount: 25.5,
+      status: "Completed",
+      transactionId: "TXN123456",
+    },
+    {
+      id: 2,
+      date: "2025-06-30",
+      amount: 15.0,
+      status: "Completed",
+      transactionId: "TXN654321",
+    },
   ];
 
   if (loading) {
@@ -92,25 +180,31 @@ const UserDashboardPage = () => {
             <tr className="bg-gray-100">
               <th className="p-3 md:p-4">Title</th>
               <th className="p-3 md:p-4">Likes</th>
-              <th className="p-3 md:p-4">Reviews</th>
+              <th className="p-3 md:p-4">Price</th>
               <th className="p-3 md:p-4">Status</th>
               <th className="p-3 md:p-4">Action</th>
             </tr>
           </thead>
           <tbody>
-            {requestedMeals.map((meal) => (
-              <tr key={meal.id} className="border-b">
-                <td className="p-3 md:p-4">{meal.title}</td>
-                <td className="p-3 md:p-4">{meal.likes}</td>
-                <td className="p-3 md:p-4">{meal.reviewsCount}</td>
-                <td className="p-3 md:p-4">{meal.status}</td>
-                <td className="p-3 md:p-4">
-                  <button className="px-4 md:px-6 py-2 rounded-3xl border-2 bg-black text-white font-semibold border-black active:scale-95">
-                    Cancel
-                  </button>
+            {Array.isArray(requestedMeals) && requestedMeals.length > 0 ? (
+              requestedMeals.map((meal) => (
+                <tr key={meal._id} className="border-b">
+                  <td className="md:p-3 p-4">{meal.mealTitle || "No title"}</td>
+                  <td className="md:p-3 p-4">{meal.mealLikes ?? "No likes"}</td>
+                  <td className="md:p-3 p-4">{meal.mealPrice || "No status"}</td>
+                  <td className="md:p-3 p-4">{meal.status || "No status"}</td>
+                  <td className="md:p-3 p-4">
+                    <button onClick={() => handleCancel(meal._id)} className="bg-black text-white px-4 py-2 rounded-xl active:scale-95 transition">Cancel</button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center">
+                  No requests found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </section>
@@ -132,18 +226,21 @@ const UserDashboardPage = () => {
               <tr key={review.id} className="border-b text-left">
                 <td className="md:p-3 p-4">{review.title}</td>
                 <td className="md:p-3 p-4">{review.likes}</td>
-                <td className="md:p-3 p-4">{review.review}</td>
+                <td className="md:p-3 p-4">{review.reviews}</td>
                 <td className="md:p-3 p-4">
                   <div className="flex flex-col md:flex-row gap-2 items-center justify-center">
-                    <button className="px-4 w-full md:px-6 py-2 rounded-3xl bg-[#FFCB74] text-white font-semibold active:scale-95 hover:bg-yellow-400 transition">
+                    <button className="px-4 w-[30%] md:px-6 py-2 rounded-3xl bg-[#FFCB74] text-white font-semibold active:scale-95 hover:bg-yellow-400 transition">
                       Edit
                     </button>
-                    <button className="px-4 w-full md:px-6 py-2 rounded-3xl bg-[#c72828f2] text-white font-semibold active:scale-95 hover:bg-red-600 transition">
+                    <button onClick={() => handleDelete(review._id)} className="px-4 w-[30%] md:px-6 py-2 rounded-3xl bg-[#c72828f2] text-white font-semibold active:scale-95 hover:bg-red-600 transition">
                       Delete
                     </button>
-                    <button className="px-4 w-full md:px-6 py-2 rounded-3xl border-2 bg-black text-white font-semibold border-black active:scale-95 hover:bg-gray-900 transition">
+                    <Link to={`/meal-details/${review.mealId}`}  className="px-4 w-[30%] md:px-6 py-2 rounded-3xl border-2 bg-black text-white font-semibold border-black active:scale-95 hover:bg-gray-900 transition text-center">
+
+                    <button>
                       View Meal
                     </button>
+                    </Link>
                   </div>
                 </td>
               </tr>

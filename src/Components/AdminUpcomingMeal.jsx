@@ -15,6 +15,25 @@ const AdminUpcomingMeal = () => {
     fetchUpcomingMeals();
   }, []);
 
+  // handling publish meal
+  const handlePublish = async (id) =>{
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/upcoming-meals/${id}`, { status: 'published' });
+      if (res.data.success) {
+        toast.success("Meal published successfully!");
+        fetchUpcomingMeals();
+      } else {
+        toast.error("Failed to publish meal.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error publishing meal.");
+    }
+  }
+
+
+
+
   const fetchUpcomingMeals = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/upcoming-meals`);
@@ -69,7 +88,7 @@ const AdminUpcomingMeal = () => {
               <td className="p-3 md:p-4">{meal.category}</td>
               <td className="p-3 md:p-4">{meal.price}</td>
               <td className="p-3 md:p-4">
-                <button className="px-4 md:px-6 py-2 rounded-3xl border-2 bg-black text-white font-semibold border-black active:scale-95">
+                <button onClick={() => handlePublish(meal._id)} className="px-4 md:px-6 py-2 rounded-3xl border-2 bg-black text-white font-semibold border-black active:scale-95">
                   Publish
                 </button>
               </td>

@@ -12,6 +12,7 @@ import MealDetailPage from "../Pages/MealDetailPage";
 import PrivateRoute from "../Context/PrivateRoute";
 import AdminRoute from "../Context/AdminRoute";
 import UserRoute from "../Context/UserRoute";
+import UpdatePage from "../Pages/UpdatePage";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,16 @@ const router = createBrowserRouter([
             <UserRoute>
               <UserDashboardPage></UserDashboardPage>
             </UserRoute>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/update-meal/:id',
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <UpdatePage></UpdatePage>
+            </AdminRoute>
           </PrivateRoute>
         ),
       },

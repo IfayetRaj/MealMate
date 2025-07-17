@@ -10,7 +10,11 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
     ingredients: "",
     description: "",
     price: "",
-    postTime: "",
+    date: "",
+    email: adminEmail,
+    displayName: adminName,
+    likes: 0,
+    rating: 0
   });
 
   const [uploading, setUploading] = useState(false);
