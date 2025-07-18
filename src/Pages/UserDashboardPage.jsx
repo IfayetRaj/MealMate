@@ -3,6 +3,7 @@ import { AuthContext } from "../Context/AuthContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router";
+import Swal from 'sweetalert2'
 
 const UserDashboardPage = () => {
   const { userData, loading } = useContext(AuthContext);
@@ -74,23 +75,42 @@ const UserDashboardPage = () => {
   }, [userData?.email]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this review?")) return;
-    try {
-      const res = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/reviews/${id}`,
-        {
-          data: { email: userData.email },
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        const res = await axios.delete(
+          `${import.meta.env.VITE_BACKEND_URL}/reviews/${id}`,
+          {
+            data: { email: userData.email },
+          }
+        );
+  
+        if (res.data.success) {
+          setReviews((prev) => prev.filter((review) => review._id !== id));
+  
+          await Swal.fire({
+            title: "Deleted!",
+            text: "Your review has been deleted.",
+            icon: "success"
+          });
+  
+          toast.success("Review deleted.");
+        } else {
+          toast.error("Delete failed.");
         }
-      );
-      if (res.data.success) {
-        setReviews((prev) => prev.filter((review) => review._id !== id));
-        toast.success("Review deleted.");
-      } else {
+      } catch (err) {
+        console.error(err);
         toast.error("Delete failed.");
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Delete failed.");
     }
   };
   
@@ -104,12 +124,51 @@ const UserDashboardPage = () => {
         setPayments(res.data);
       }
       catch(err){
-        console.error(err);
-        // toast.error("Failed to fetch payment history.");
+        toast.error("Failed to fetch payment history.", err);
       }
     }
     fetching();
   }, []);
+
+
+
+
+
+
+  const handleEdit = async (id) => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/reviews/${id}`);
+      const review = res.data;
+  
+      const result = await Swal.fire({
+        title: "Edit your review",
+        input: 'text',
+        inputValue: review.text, 
+        showCancelButton: true,
+        confirmButtonText: "Save",
+        cancelButtonText: "Cancel"
+      });
+  
+      if (result.isConfirmed) {
+        const updatedText = result.value;
+  
+        await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/reviews/${id}`, {
+          text: updatedText
+        });
+  
+        Swal.fire("Saved!", "", "success");
+        toast.success("Review updated!");
+
+      }
+    } catch (err) {
+
+      toast.error("Something went wrong.", err);
+    }
+  };
+
+
+
+
 
 
 
@@ -248,7 +307,7 @@ const UserDashboardPage = () => {
                   <td className="p-4">{review.reviews}</td>
                   <td className="p-4">
                     <div className="flex flex-col md:flex-row flex-wrap gap-2">
-                      <button className="px-4 py-2 rounded-full bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium transition">
+                      <button onClick={() => handleEdit(review._id)} className="px-4 py-2 rounded-full bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium transition">
                         Edit
                       </button>
                       <button

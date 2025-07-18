@@ -3,6 +3,7 @@ import { NavLink, Link } from "react-router";
 import { CiUser } from "react-icons/ci";
 import { AuthContext } from "../Context/AuthContext";
 import toast from "react-hot-toast";
+import { IoIosNotificationsOutline } from "react-icons/io";
 
 const Navbar = () => {
   const { user, logOutUser, userData } = useContext(AuthContext);
@@ -82,6 +83,10 @@ const Navbar = () => {
         <ul className="menu menu-horizontal px-1">{links}</ul>
       </div>
       <div className="navbar-end">
+      <IoIosNotificationsOutline size={35} className="mx-4 cursor-pointer" onClick={() =>{
+
+        toast("No new notifications at the moment!");
+      }}/>
         {user ? (
           <div className="dropdown dropdown-end">
             <div
