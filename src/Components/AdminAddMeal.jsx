@@ -16,7 +16,7 @@ const AdminAddMeal = () => {
 
     const form = e.target;
     const title = form.title.value;
-    const category = form.category.value; // dropdown value
+    const category = form.category.value; 
     const image = form.image.files[0];
     const ingredients = form.ingredients.value;
     const description = form.description.value;
@@ -33,12 +33,13 @@ const AdminAddMeal = () => {
     const formData = new FormData();
     formData.append("image", image);
 
+    
     try {
-      // Upload image to imgbb
       const imgRes = await axios.post(
         `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
         formData
       );
+
 
       if (imgRes.data.success) {
         const mealData = {

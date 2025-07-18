@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Card from "./Card";
-import { Link } from "react-router"; 
+import { Link } from "react-router";
 
 const MealsByCategory = () => {
   const [activeTab, setActiveTab] = useState("All");
@@ -9,9 +9,13 @@ const MealsByCategory = () => {
 
   const fetchMeals = async (category) => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/meals-by-category?category=${category}`
-      );
+      let url = `${import.meta.env.VITE_BACKEND_URL}/meals-by-category`;
+
+      if (category && category !== "All") {
+        url += `?category=${category}`;
+      }
+
+      const res = await axios.get(url);
       setMeals(res.data);
     } catch (err) {
       console.error(err);
@@ -29,7 +33,7 @@ const MealsByCategory = () => {
       </h2>
 
       <div className="flex justify-center gap-4 mb-8">
-        {["Breakfast", "Lunch", "Dinner"].map((tab) => (
+        {["All", "Breakfast", "Lunch", "Dinner"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}

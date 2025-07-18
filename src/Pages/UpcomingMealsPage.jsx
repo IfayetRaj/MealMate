@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const UpcomingMealsPage = () => {
   const [upcomingMeals, setUpcomingMeals] = useState([]);
-  const [loading, setLoading] = useState(true); // track loading
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetching = async () => {

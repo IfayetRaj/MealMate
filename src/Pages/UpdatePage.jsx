@@ -49,7 +49,7 @@ const UpdatePage = () => {
       );
 
       const imageUrl = imgbbRes.data.data.url;
-      console.log("Image URL:", imageUrl);
+
 
       // 2️⃣ Create updated meal object
       const updatedMeal = {

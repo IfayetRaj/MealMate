@@ -5,17 +5,12 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
-    image: null, 
+    image: null,
     distributorName: "",
     ingredients: "",
     description: "",
     price: "",
-    date: "",
-    email: adminEmail,
-    displayName: adminName,
-    likes: 0,
-    rating: 0,
-    status: "upcoming"
+    postTime: "", // consistent
   });
 
   const [uploading, setUploading] = useState(false);
@@ -38,6 +33,7 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.image) {
       alert("Please select an image!");
       return;
@@ -46,7 +42,6 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
     try {
       setUploading(true);
 
-      // Upload image to imgbb
       const imgbbAPI = `https://api.imgbb.com/1/upload?key=${
         import.meta.env.VITE_IMGBB_API_KEY
       }`;
@@ -54,22 +49,36 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
       const imageData = new FormData();
       imageData.append("image", formData.image);
 
+
+
+      // ✅ Do NOT set headers manually
       const res = await axios.post(imgbbAPI, imageData);
 
       if (res.data.success) {
         const imageUrl = res.data.data.url;
 
-        // Now send data with uploaded image URL
+        // ✅ Proper final mealData
         const mealData = {
-          ...formData,
+          title: formData.title,
+          category: formData.category,
           image: imageUrl,
+          distributorName: formData.distributorName,
+          ingredients: formData.ingredients,
+          description: formData.description,
+          price: parseFloat(formData.price),
+          postTime: formData.postTime,
+          email: adminEmail,
+          displayName: adminName,
+          likes: 0,
+          rating: 0,
+          status: "upcoming",
         };
-        delete mealData.image; // remove the file, add url instead
-        mealData.image = imageUrl;
+
+
 
         onSubmit(mealData);
 
-        // Reset form
+        // ✅ Reset form fully
         setFormData({
           title: "",
           category: "",
@@ -81,10 +90,11 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
           postTime: "",
         });
       } else {
-        alert("Image upload failed. Try again.");
+        console.error(res.data);
+        alert(`Image upload failed: ${res.data.error.message}`);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Image upload error:", err);
       alert("Image upload error!");
     } finally {
       setUploading(false);
@@ -92,7 +102,10 @@ const AddMeal = ({ adminName, adminEmail, onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <form
+      onSubmit={handleSubmit}
+      className="grid grid-cols-1 md:grid-cols-2 gap-6"
+    >
       <input
         type="text"
         name="title"

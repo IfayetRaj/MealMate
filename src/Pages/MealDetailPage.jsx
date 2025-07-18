@@ -9,7 +9,6 @@ const MealDetailPage = () => {
   const { id } = useParams();
   const { userData } = useContext(AuthContext);
   const [meal, setMeal] = useState(null);
-
   const [likes, setLikes] = useState(0);
   const [liked, setLiked] = useState(false);
   // here
@@ -41,7 +40,7 @@ const MealDetailPage = () => {
     const fetchReviews = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/reviews/${id}`
+          `${import.meta.env.VITE_BACKEND_URL}/reviews/meal/${id}`
         );
         setReviews(res.data);
       } catch (err) {
@@ -68,7 +67,6 @@ const MealDetailPage = () => {
         toast.success("🎉 This upcoming meal has been released!");
       }
     } catch (err) {
-      console.error("Failed to toggle like:", err);
       if (err.response?.data?.error) {
         toast.error(`Error: ${err.response.data.error}`);
       } else {
@@ -108,6 +106,7 @@ const MealDetailPage = () => {
       toast.error("Something went wrong while requesting the meal.");
     }
   };
+
 
   const handlePostReview = async () => {
     if (!newReview.trim()) return;
@@ -173,6 +172,9 @@ const MealDetailPage = () => {
                     </li>
                   ))}
               </ul>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm mb-2">Price: {meal.price} Tk</p>
             </div>
 
             <p className="text-gray-500 text-sm mb-2">
@@ -244,7 +246,7 @@ const MealDetailPage = () => {
 
       <div className="bg-white rounded-3xl shadow-lg p-6 mt-10">
         <h2 className="text-2xl md:text-3xl font-bold mb-6">
-          Reviews ({reviews.length})
+          Reviews {meal.reviews}
         </h2>
         <div className="mb-8">
           <textarea

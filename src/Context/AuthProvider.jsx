@@ -14,17 +14,20 @@ import { auth, provider } from "../Firebase/Firebase.init";
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState(null);
-
+  const [userData, setUserData] = useState(null)
 
   // observer
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
+
+        // setting token
         try {
-          const res = await axios.get(`http://localhost:3000/user/${currentUser.email.toLowerCase()}`);
-          setUserData(res.data); 
+          const res = await axios.get(
+            `http://localhost:3000/user/${currentUser.email.toLowerCase()}`
+          );
+          setUserData(res.data);
         } catch (err) {
           console.error(err);
           setUserData(null);
@@ -32,14 +35,16 @@ const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
         setUserData(null);
+
       }
-      setLoading(false); 
+      setLoading(false);
     });
-  
+
     return () => unsubscribe();
   }, []);
 
-
+  // Axios interceptor
+ 
   // create user with email and password
 
   const createUser = (email, password) => {
